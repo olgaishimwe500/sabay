@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  Sabay chat
+{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'chat/mystyle.css' %}" />
+{% endblock %}
+
+{% block content %}
+  <main class="chat-page">
+    <div class="message-layout">
+      <aside class="conversation-list">
+        <ul class="conversation-items">
+          <li class="conversation-item" data-room="olga-room">
+            <span class="converstion-name">Olga</span>
+            <span class="conversation-preview">he-he</span>
+          </li>
+          <li class="conversion-item" data-room="diana-room">
+            <span class="conversation-name">Diana</span>
+            <span class="conversation-preview">diannaaaa</span>
+          </li>
+          <li class="conversion-item" data-room="diana-room">
+            <span class="conversation-name">Diana</span>
+            <span class="conversation-preview">diannaaaa</span>
+          </li>
+        </ul>
+      </aside>
+      <section class="active-thread">
+        <p class="placeholder-text">this is where specific converstion theres, clicka person to chat with, converstion opens here</p>
+      </section>
+      <div class="sidebar-right">
+        <div class="profile-detail">
+          <p class="placeholder-text">profile detail of the person being texted</p>
+        </div>
+        <div class="suggested-profiles ">
+          <p class="placeholder-text">this is where suggested profiles or people you haven't texted</p>
+        </div>
+      </div>
+    </div> 
+  </br> 
+    <!-- <p>What chat room would you like to enter?</p>
+    <br />
+    <input id="room-name-input" type="text" size="100" /><br />
+    <input id="room-name-submit" type="button" value="Enter" /> -->
+  </main>
+  <script>
+  //   document.querySelector("#room-name-input").focus();
+  //   document.querySelector("#room-name-input").onkeyup = function (e) {
+  //     if (e.key === "Enter") {
+  //       // enter, return
+  //       document.querySelector("#room-name-submit").click();
+  //     }
+  //   };
+  
+  //   document.querySelector("#room-name-submit").onclick = function (e) {
+  //     var roomName = document.querySelector("#room-name-input").value;
+  //     window.location.pathname = "/chat/" + roomName + "/";
+  //   };
+    document.querySelectorAll('.conversation-item').forEach(function (item){
+      item.onclick = function(){
+        var roomName =item.dataset.room;
+        window.location.pathname = '/chat/' + roomName + '/';
+      };
+    });
+  </script>
+{% endblock %}

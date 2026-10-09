@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Sabay{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/simple.min.css' %}">
-     <link rel="stylesheet" href="{% static 'css/custom.css' %}">
-     <script src="{% static 'js/nav.js' %}" defer></script>
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <script src="{% static 'js/nav.js' %}" defer></script>
     {% block extra_head %}{% endblock %}
   </head>
   <body>
@@ -21,6 +21,8 @@
 			    <li><a href="{% url 'home' %}"> Home </a></li>
 
 			    <li><a href="{% url 'dashboard' %}">Dashboard </a></li>
+
+			    <li><a href="{% url 'chat:index' %}">Chat </a></li>
 			    <!-- Checks to see if user is authenticated -->
 			    {% if user.is_authenticated %}
 			    	<form action="{% url 'members:logout' %}" method="post" class="logout-form">

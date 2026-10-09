@@ -1,0 +1,123 @@
+:root {
+  --navyblue: #0b1220;
+  --darkblue: #0f1115;
+  --white: #f5f5f5;
+  --lightbrown: #c4a484;
+  --midnightblue: #191970;
+  --lavender: hsl(240, 67%, 94%);
+  --slateblue: #6a5acd;
+  --babypink: #f8d2f9;
+}
+
+/* unset simple css start */
+body {
+  display: block;
+}
+
+aside, details, pre, progress {
+  margin-bottom: 0;
+}
+
+aside {
+  width: 100%;
+  padding: 0;
+  margin-inline-start: 0;
+}
+/* unset simple css end */
+
+.chat-page {
+  padding: 90px 20px 20px;
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+.chat-page .chat-nav {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  background-color: var(--lavender);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+}
+
+.chat-page .chat-nav .brand {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--black);
+  text-decoration: none;
+}
+
+.chat-page .chat-nav-links {
+  display: flex;
+  gap: 30px;
+}
+
+.chat-page .chat-nav a {
+  color: var(--black);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.chat-page .chat-nav a:hover {
+  opacity: 0.6;
+}
+
+/* details about the bars */
+.chat-page .message-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr 260px;
+  gap: 20px;
+  height: calc(100vh - 130px);
+}
+.chat-page .conversation-list,
+.chat-page .active-thread,
+.chat-page .profile-detail,
+.chat-page .suggested-profiles {
+  border: 2px solid black;
+  padding: 16px;
+}
+.chat-page .sidebar-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+}
+.chat-page .profile-detail,
+.chat-page .suggested-profiles {
+  flex: 1;
+}
+.chat-page .placeholder-text {
+  font-family: system-ui, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+/* the aside bar */
+.chat-page .conversation-items {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.chat-page .conversation-item {
+  display: block;
+  padding: 10px 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+.chat-page .conversation-item:hover {
+  background-color: var(--lavender);
+}
+.chat-page .conversation-name {
+  display: block;
+  font-weight: 600;
+}
+.chat-page .conversation-preview {
+  display: block;
+  font-size: 0.85rem;
+  color: #888;
+}
