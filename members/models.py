@@ -1,11 +1,24 @@
+from datetime import date
 from django.db import models
 from django.conf import settings
 # Create your models here.
 #below are the seeker and employee models.
 
+#added profile fields for the seeker
 class Seeker(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="seeker_profile",)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="seeker_profile")
     location = models.CharField(max_length=300, blank=True)
+    photo = models.ImageField(upload_to="seekers/", blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+
+    @property
+    def age(self):
+        if not self.date_of_birth:
+            return None
+        today = date.today()
+        return today.year - self.date_of_birth.year - ((today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day))
+
+        
 
     def __str__(self):
         return f"Sekeer: {self.user}"
