@@ -29,4 +29,4 @@ urlpatterns = [
     path("members/", include("members.urls")),
     path("dashboard/", views.dashboard, name="dashboard"),
 ]
-urlpatterns += static(settings.MEDIA_RLS, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

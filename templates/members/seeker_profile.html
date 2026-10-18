@@ -1,0 +1,15 @@
+{% extends "base.html" %} 
+{% block title %}My profile | Sabay {% endblock%} 
+{%block content %}
+  <h1>{{ seeker.user.get_full_name|default:seeker.user.username}}</h1>
+  {% if seeker.photo %}
+    <img src="{{seeker.photo.url}}" alt="Profile photo" width="160" />
+  {% endif %}
+  <p>Age: {{ seeker.age|default:"Not set"}}</p>
+  <p>Address:{{ seeker.location|default:"Not set"}}</p>
+  <p><a href="{%  url 'members:seeker_profile_edit' %}">Edit profile</a></p>
+  {% comment %}
+  for now will resolve once booking is added in urls:
+  <a href="{% url 'booking:post_job' %}"><button type="button">Post a job</button></a>
+  {% endcomment %} 
+{% endblock %}

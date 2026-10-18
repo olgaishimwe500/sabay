@@ -137,7 +137,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = "/media/"
-MEDIAL_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Global URLs incase url changes
 LOGIN_URL = "members:login"
