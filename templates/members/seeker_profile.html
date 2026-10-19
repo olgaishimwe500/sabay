@@ -6,7 +6,7 @@
     <img src="{{seeker.photo.url}}" alt="Profile photo" width="160" />
   {% endif %}
   <p>Age: {{ seeker.age|default:"Not set"}}</p>
-  <p>Address:{{ seeker.location|default:"Not set"}}</p>
+  <p>Address: {{ seeker.location|default:"Not set"}}</p>
   <p><a href="{%  url 'members:seeker_profile_edit' %}">Edit profile</a></p>
   {% comment %}
   for now will resolve once booking is added in urls:

@@ -5,7 +5,7 @@ from members.models import Seeker, Employee
 
 class JobPost(models.Model):
     seeker = models.ForeignKey(Seeker, on_delete=models.CASCADE, related_name="job_posts")
-    Employee = models.ForeignKey(Employee, null=True, blank=True, on_delete=models.SET_NULL, related_name="accepted_jobs")
+    Provider = models.ForeignKey(Employee, null=True, blank=True, on_delete=models.SET_NULL, related_name="accepted_jobs")
     task_type = models.CharField(max_length=200)
     description = models.TextField()
     address = models.CharField(max_length=255)
