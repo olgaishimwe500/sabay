@@ -4,15 +4,14 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('members', '0003_remove_provider_verified_provider_pfp_and_more'),
+        ("members", "0003_remove_provider_verified_provider_pfp_and_more"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='provider',
-            old_name='pfp',
-            new_name='profilePicture',
+            model_name="provider",
+            old_name="pfp",
+            new_name="profilePicture",
         ),
     ]

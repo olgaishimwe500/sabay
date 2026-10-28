@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('members', '0007_alter_provider_profilepicture'),
+        ("members", "0007_alter_provider_profilepicture"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='cert',
-            name='name',
+            model_name="cert",
+            name="name",
             field=models.CharField(max_length=200, unique=True),
         ),
     ]

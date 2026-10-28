@@ -4,14 +4,16 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('members', '0012_alter_cert_options_alter_providercert_options'),
+        ("members", "0012_alter_cert_options_alter_providercert_options"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='providercert',
-            options={'verbose_name': 'Provider Specific Certification', 'verbose_name_plural': 'Provider Specific Certifications'},
+            name="providercert",
+            options={
+                "verbose_name": "Provider Specific Certification",
+                "verbose_name_plural": "Provider Specific Certifications",
+            },
         ),
     ]

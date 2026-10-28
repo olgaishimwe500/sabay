@@ -5,29 +5,67 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('members', '0001_initial'),
+        ("members", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='JobPost',
+            name="JobPost",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('task_type', models.CharField(max_length=200)),
-                ('description', models.TextField()),
-                ('address', models.CharField(max_length=255)),
-                ('schedule_start', models.DateTimeField()),
-                ('schedule_end', models.DateTimeField()),
-                ('status', models.CharField(choices=[('open', 'Open'), ('accepted', 'Accepted'), ('completed', 'Completed'), ('cancelled', 'Cancelled')], default='open', max_length=20)),
-                ('is_recurring', models.BooleanField(default=False)),
-                ('recurrence_rule', models.CharField(blank=True, max_length=20, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('Employee', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='accepted_jobs', to='members.employee')),
-                ('seeker', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='job_posts', to='members.seeker')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("task_type", models.CharField(max_length=200)),
+                ("description", models.TextField()),
+                ("address", models.CharField(max_length=255)),
+                ("schedule_start", models.DateTimeField()),
+                ("schedule_end", models.DateTimeField()),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("open", "Open"),
+                            ("accepted", "Accepted"),
+                            ("completed", "Completed"),
+                            ("cancelled", "Cancelled"),
+                        ],
+                        default="open",
+                        max_length=20,
+                    ),
+                ),
+                ("is_recurring", models.BooleanField(default=False)),
+                (
+                    "recurrence_rule",
+                    models.CharField(blank=True, max_length=20, null=True),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "Employee",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="accepted_jobs",
+                        to="members.employee",
+                    ),
+                ),
+                (
+                    "seeker",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="job_posts",
+                        to="members.seeker",
+                    ),
+                ),
             ],
         ),
     ]

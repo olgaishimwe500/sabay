@@ -5,42 +5,61 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('members', '0008_alter_cert_name'),
+        ("members", "0008_alter_cert_name"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='cert',
-            name='document',
+            model_name="cert",
+            name="document",
         ),
         migrations.RemoveField(
-            model_name='cert',
-            name='expires',
+            model_name="cert",
+            name="expires",
         ),
         migrations.RemoveField(
-            model_name='cert',
-            name='is_verified',
+            model_name="cert",
+            name="is_verified",
         ),
         migrations.RemoveField(
-            model_name='cert',
-            name='issuer',
+            model_name="cert",
+            name="issuer",
         ),
         migrations.RemoveField(
-            model_name='cert',
-            name='provider',
+            model_name="cert",
+            name="provider",
         ),
         migrations.CreateModel(
-            name='ProviderCert',
+            name="ProviderCert",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('issuer', models.CharField(max_length=150)),
-                ('document', models.FileField(blank=True, upload_to='certificates/')),
-                ('expires', models.DateField(null=True)),
-                ('is_verified', models.BooleanField(default=False)),
-                ('cert', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='members.cert')),
-                ('provider', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='certificates', to='members.provider')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("issuer", models.CharField(max_length=150)),
+                ("document", models.FileField(blank=True, upload_to="certificates/")),
+                ("expires", models.DateField(null=True)),
+                ("is_verified", models.BooleanField(default=False)),
+                (
+                    "cert",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="members.cert"
+                    ),
+                ),
+                (
+                    "provider",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="certificates",
+                        to="members.provider",
+                    ),
+                ),
             ],
         ),
     ]

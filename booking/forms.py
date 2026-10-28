@@ -22,7 +22,7 @@ class JobPostForm(forms.ModelForm):
 
     class Meta:
         model = JobPost
-        fields = ["title", "task_type", "description", "schedule_start", "schedule_end", "address", "more_info"]
+        fields = ["task_type", "description", "schedule_start", "schedule_end", "address"]
         labels = { "schedule_start": "start", "schedule_end": "end", "address": "where does the task happen", "more info": "anything else we shoul know",}
         widgets = {
             "schedule_start": forms.DateTimeInput(attrs={"type": "datetime-local"}, format=DT_FORMAT),

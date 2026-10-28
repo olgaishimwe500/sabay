@@ -4,24 +4,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('members', '0002_specialty_provider_cert_delete_employee'),
+        ("members", "0002_specialty_provider_cert_delete_employee"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='provider',
-            name='verified',
+            model_name="provider",
+            name="verified",
         ),
         migrations.AddField(
-            model_name='provider',
-            name='pfp',
-            field=models.ImageField(blank=True, null=True, upload_to='profile_picture'),
+            model_name="provider",
+            name="pfp",
+            field=models.ImageField(blank=True, null=True, upload_to="profile_picture"),
         ),
         migrations.AlterField(
-            model_name='specialty',
-            name='name',
+            model_name="specialty",
+            name="name",
             field=models.CharField(max_length=100, unique=True),
         ),
     ]

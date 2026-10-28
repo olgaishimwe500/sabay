@@ -5,16 +5,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('booking', '0002_remove_jobpost_employee'),
-        ('members', '0002_specialty_provider_cert_delete_employee'),
+        ("booking", "0002_remove_jobpost_employee"),
+        ("members", "0002_specialty_provider_cert_delete_employee"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='jobpost',
-            name='Provider',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='accepted_jobs', to='members.provider'),
+            model_name="jobpost",
+            name="Provider",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="accepted_jobs",
+                to="members.provider",
+            ),
         ),
     ]

@@ -4,30 +4,36 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('members', '0004_rename_pfp_provider_profilepicture'),
+        ("members", "0004_rename_pfp_provider_profilepicture"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='provider',
-            name='bio',
-            field=models.TextField(blank=True, verbose_name='Bio'),
+            model_name="provider",
+            name="bio",
+            field=models.TextField(blank=True, verbose_name="Bio"),
         ),
         migrations.AlterField(
-            model_name='provider',
-            name='city',
-            field=models.CharField(blank=True, max_length=50, verbose_name='City'),
+            model_name="provider",
+            name="city",
+            field=models.CharField(blank=True, max_length=50, verbose_name="City"),
         ),
         migrations.AlterField(
-            model_name='provider',
-            name='profilePicture',
-            field=models.ImageField(blank=True, null=True, upload_to='profile_picture', verbose_name='Profile Picture'),
+            model_name="provider",
+            name="profilePicture",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                upload_to="profile_picture",
+                verbose_name="Profile Picture",
+            ),
         ),
         migrations.AlterField(
-            model_name='provider',
-            name='specialties',
-            field=models.ManyToManyField(blank=True, to='members.specialty', verbose_name='Specialties'),
+            model_name="provider",
+            name="specialties",
+            field=models.ManyToManyField(
+                blank=True, to="members.specialty", verbose_name="Specialties"
+            ),
         ),
     ]

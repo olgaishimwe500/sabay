@@ -5,15 +5,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('members', '0009_remove_cert_document_remove_cert_expires_and_more'),
+        ("members", "0009_remove_cert_document_remove_cert_expires_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='providercert',
-            name='provider',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='cert', to='members.provider'),
+            model_name="providercert",
+            name="provider",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="cert",
+                to="members.provider",
+            ),
         ),
     ]
