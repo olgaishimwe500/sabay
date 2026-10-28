@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}{{ job.title|default:job.task_type }} | Sabay{% endblock %}
+
+{% block content %}
+  <h1>{{ job.title|default:job.task_type }}</h1>
+  <p>Status: {{ job.get_status_display }}</p>
+  <p>Type: {{ job.task_type }}</p>
+  <p>When: {{ job.schedule_start|date:"M j, Y g:i A" }} to {{ job.schedule_end|date:"g:i A" }}</p>
+  <p>{{ job.description }}</p>
+  {% if job.more_info %}<p>More info: {{ job.more_info }}</p>{% endif %}
+
+  {% if request.user == job.seeker.user or job.status == "confirmed" %}
+    <p>Address: {{ job.address }}</p>
+  {% endif %}
+
+  <p>Posted by {{ job.seeker.user.username }}</p>
+  <p><a href="{% url 'booking:job_list' %}">Back to the board</a></p>
+{% endblock %}

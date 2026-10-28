@@ -28,5 +28,6 @@ urlpatterns = [
     path("chat/", include("chat.urls")),
     path("members/", include("members.urls")),
     path("dashboard/", views.dashboard, name="dashboard"),
+    path("jobs/", include("booking.urls")),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

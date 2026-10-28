@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Job board | Sabay{% endblock %}
+
+{% block extra_head %}
+<style>
+  .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+  .job-card { border: 1px solid #555; border-radius: 10px; padding: 1rem; }
+  .job-status { font-size: 0.8rem; padding: 2px 8px; border-radius: 999px; background: #555; }
+  .job-open { background: #1d6fe0; color: #fff; }
+</style>
+{% endblock %}
+
+{% block content %}
+  <h1>Job board</h1>
+  <p><a href="{% url 'booking:post_job' %}"><button type="button">Post a job</button></a></p>
+
+  <div class="job-grid">
+    {% for job in jobs %}
+      {% include "booking/_job_card.html" %}
+    {% empty %}
+      <p>No jobs posted yet.</p>
+    {% endfor %}
+  </div>
+{% endblock %}

@@ -1,0 +1,8 @@
+<article class="job-card">
+  <span class="job-status job-{{ job.status }}">{{ job.get_status_display }}</span>
+  <h3>{{ job.title|default:job.task_type }}</h3>
+  <p><strong>{{ job.task_type }}</strong></p>
+  <p>{{ job.schedule_start|date:"M j, Y" }}<br>{{ job.schedule_start|date:"g:i A" }} to {{ job.schedule_end|date:"g:i A" }}</p>
+  <p>{{ job.description|truncatechars:90 }}</p>
+  <a href="{% url 'booking:job_detail' job.pk %}"><button type="button">View more</button></a>
+</article>
