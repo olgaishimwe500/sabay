@@ -26,4 +26,5 @@ urlpatterns = [
     path("logout/", views.logout, name="logout"),
     path("profile/", seeker_views.seeker_profile, name="seeker_profile"),
     path("profile/edit/", seeker_views.seeker_profile_edit, name="seeker_profile_edit"),
+    path("dashboard/", seeker_views.seeker_dashboard, name="seeker_dashboard"),
 ]
