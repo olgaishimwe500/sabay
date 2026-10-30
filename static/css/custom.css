@@ -6,7 +6,22 @@
  * simple.min.css.
  */
 
+.width-issue {
+	grid-column: 1 / -1;
+	padding-inline: 1.5rem;
+}
+
+body {
+	display: block;
+}
+main {
+	padding-inline: 1.5rem;
+	display: flex;
+	justify-content: center;
+}
+
 /* Navigation custom rules */
+
 nav{
 	grid-column: 1/-1;
 	background-color: #808080;

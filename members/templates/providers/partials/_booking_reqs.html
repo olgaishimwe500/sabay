@@ -1,0 +1,34 @@
+{% load static %}
+
+{% partialdef booking-req %}
+<div class="bookings-container">
+	{% for job in booking_requests %}
+	<div class="job-card">
+		<div class="ls-card">
+			<div class="img-container">
+				{% if job.seeker.photo %}
+					<img src=" {{ job.seeker.photo.url }}" alt="seeker profile picture">
+				{% else %}
+					<p>No PFP</p>
+				{% endif %}
+			</div>
+			<div class="job-info">
+				<span>{{ job.seeker.user.get_full_name }}</span>
+				<p>{{ job.task_type }}</p>
+				<p>{{ job.address }} </p>
+			</div>
+		</div>
+		<div class="options">
+			<form method="post" action="{% url 'members:job_response' job.id %}">
+				{% csrf_token %}
+				<button type="submit" name="action" value="accept"> Accept </button>
+				<button type="submit" name="action" value="decline"> Decline </button>
+			</form>
+			<button> Message </button>
+		</div>
+	</div>
+	{% empty %}
+	<p> No booking requests right now.</p>
+	{% endfor %}
+</div>
+{% endpartialdef %}

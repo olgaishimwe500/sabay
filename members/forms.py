@@ -1,5 +1,7 @@
 from django import forms
-from.models import Seeker
+
+from .models import Seeker
+
 
 class SeekerProfileForm(forms.ModelForm):
     class Meta:

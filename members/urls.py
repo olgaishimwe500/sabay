@@ -17,14 +17,17 @@ Including another URLconf
 
 from django.urls import path
 
-from . import views, seeker_views
+from . import seeker_views, views
 
 app_name = "members"
 
 urlpatterns = [
     path("login/", views.login, name="login"),
     path("logout/", views.logout, name="logout"),
+    path("api/cities/", views.city_autofill, name="city_suggestions"),
+    path("toggle-availability/", views.toggle_availability, name="toggle_availability"),
     path("profile/", seeker_views.seeker_profile, name="seeker_profile"),
     path("profile/edit/", seeker_views.seeker_profile_edit, name="seeker_profile_edit"),
     path("dashboard/", seeker_views.seeker_dashboard, name="seeker_dashboard"),
+    path("job-response/<int:job_id>/", views.job_response, name="job_response"),
 ]

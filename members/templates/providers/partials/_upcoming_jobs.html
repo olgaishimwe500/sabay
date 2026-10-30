@@ -1,0 +1,34 @@
+{% load static %}
+
+{% partialdef upcoming-jobs %}
+<div class="bookings-container">
+	{% for job in upcoming_jobs %}
+	<div class="job-card">
+		<div class="ls-card">
+			<div class="img-container">
+				{% if job.seeker.photo %}
+					<img src=" {{ job.seeker.photo.url }}" alt="seeker profile picture">
+				{% else %}
+					<p>No PFP</p>
+				{% endif %}
+			</div>
+			<div class="job-info">
+				{% with duration=job.schedule_end|timeuntil:job.schedule_start %}
+					<span>{{ job.seeker.user.get_full_name }}</span>
+					<p>{{ job.task_type }} &middot; {{ duration }} </p>
+					<!-- https://docs.djangoproject.com/en/6.1/ref/templates/builtins/#date -->
+					<p>{{ job.schedule_start|date:"D, M j" }} &middot; {{ job.schedule_start|time:"g:i A" }} &middot; {{job.address }} </p> 
+					{% endwith %}
+				
+			</div>
+		</div>
+		<div class="options">
+			<button> Message </button>
+			<button> Details </button>
+		</div>
+	</div>
+	{% empty %}
+	<p> No upcoming jobs.</p>
+	{% endfor %}
+</div>
+{% endpartialdef %}

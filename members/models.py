@@ -65,6 +65,7 @@ class Provider(models.Model):
     # another model??
     city = models.CharField(max_length=50, blank=True, verbose_name="City")
     is_available = models.BooleanField(default=False, verbose_name="Is Available")
+    is_provider = models.BooleanField(default=True, verbose_name="Provider Status")
 
     def __str__(self):
         return f"Provider: {self.user}"
