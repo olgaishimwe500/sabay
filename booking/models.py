@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models , transaction
 
 from members.models import Provider, Seeker
 
@@ -36,3 +36,36 @@ class JobPost(models.Model):
     is_recurring = models.BooleanField(default=False)
     recurrence_rule = models.CharField(max_length=20, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+class JobReq(models.Model):
+    job = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name="applications")
+    provider = models.ForeignKey(Provider, on_delete=models.CASCADE, related_name="applications")
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("pending", "Pending"),
+            ("approved", "Approved"),
+            ("declined", "Declined"),
+        ],
+        default="pending",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    """
+    Allows seekers to approve a request
+    """
+    def approve(self):
+        with transaction.atomic():
+            self.status = "approved"
+            self.save()
+
+            job = self.job
+            job.provider = self.provider
+            job.status = "accepted"
+            job.save()
+
+            type(self).objects.filter(job=job).exclude(pk=self.pk).update(status="declined")
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["job", "provider"], name="one_application_per_provider")
+        ]
+

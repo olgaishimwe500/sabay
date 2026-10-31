@@ -22,8 +22,16 @@
 			</div>
 		</div>
 		<div class="options">
-			<button> Requeset </button>
-			<button> Details </button>
+			{% if job.my_status == "pending" %}
+				<span class="job-req-status pending">Requested &middot; waiting on seeker</span>
+			{% elif job.my_status == "declined" %}
+				<span class="job-req-status declined">Not selected</span>
+			{% else %}
+				<form method="post" action={% url "members:job_request" job.id %}>
+					{% csrf_token %}
+					<button type="submit" name="action"> Requeset </button>
+				</form>
+			{% endif %}
 		</div>
 	</div>
 	{% empty %}

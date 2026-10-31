@@ -6,8 +6,8 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-
-from booking.models import JobPost
+from django.db.models import OuterRef, Subquery, Q
+from booking.models import JobPost, JobReq
 
 from .cities import CITIES
 
@@ -72,6 +72,7 @@ Hopefully this can replace the availablity deal :)
 """
 
 
+@login_required
 @require_POST
 def toggle_availability(request):
     provider = request.user.provider_profile
@@ -97,12 +98,19 @@ def dashboard(request):
         )
         upcoming_jobs = (
             JobPost.objects.select_related("seeker__user")
-            .filter(status="accepted", provider=provider, schedule_start__gte=now)
+            # Using Q from db.models allows for grouping filters
+            .filter(Q(status="accepted", provider=provider, schedule_start__gte=now) | Q(applications__provider=provider, applications__status="approved"))
             .order_by("schedule_start")
         )
+        my_request_status = JobReq.objects.filter(
+            job=OuterRef("pk"), provider=provider
+        ).values("status")[:1]
+
         open_jobs = (
             JobPost.objects.select_related("seeker__user")
-            .filter(status="open")
+            .filter(status="open", provider__isnull=True)
+            .exclude(applications__provider=provider, applications__status="approved")
+            .annotate(my_status=Subquery(my_request_status))
             .order_by("-created_at")
         )
         return render(
@@ -112,7 +120,8 @@ def dashboard(request):
                 "provider": provider,
                 "booking_requests": booking_requests,
                 "upcoming_jobs": upcoming_jobs[:3],
-                "open_jobs": open_jobs[:3]
+                "open_jobs": open_jobs[:3], 
+
             },
         )
     elif hasattr(request.user, "seeker_profile"):
@@ -128,7 +137,6 @@ Handles if provider accepts a job or declines it
 @require_POST
 def job_response(request, job_id):
     job = get_object_or_404(JobPost, pk=job_id)
-
     action = request.POST.get("action")
     print("POST data:", request.POST, "| action:", action)
     if action == "accept":
@@ -139,4 +147,20 @@ def job_response(request, job_id):
     job.save()
     job.refresh_from_db()
     print("Saved status:", repr(job.status))
+    return redirect("dashboard")
+
+"""
+Handles the logic when a provider requests a 
+job.
+"""
+
+
+@login_required
+@require_POST
+def job_request(request, job_id):
+    provider = getattr(request.user, "provider_profile", None)
+    if provider is None:
+        return redirect("home")
+    job = get_object_or_404(JobPost, pk=job_id, status="open", provider__isnull=True)
+    JobReq.objects.get_or_create(job=job, provider=provider)
     return redirect("dashboard")
