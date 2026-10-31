@@ -5,13 +5,13 @@
 {% block extra_head %}
   {% include "booking/job_style.html" %}
   <style>
-    .dash { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
+    .dash { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; width:100%}
     @media (max-width: 800px) { .dash { grid-template-columns: 1fr; } }
     .panel { border: 1px solid #555; border-radius: 10px; padding: 1rem; margin-bottom: 1.5rem; }
     .row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .6rem 0; border-top: 1px solid #444; }
     .row:first-of-type { border-top: none; }
     .muted { font-size: .85rem; opacity: .7; }
-    .top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; width: 100% }
   </style>
 {% endblock %}
 
@@ -29,18 +29,18 @@
     <div>
       <section class="panel">
         <h2>My job posts</h2>
-        {% for job in pending_jobs %}
+        {% for req in pending_reqs %}
           <div class="row">
             <div>
-              <strong>{{ job.task_type }}</strong>
-              <div class="muted">{{ job.schedule_start|date:"D, M j, g:i A" }}{% if job.provider %} &middot; {{ job.provider.user.username }} wants this job{% endif %}</div>
+              <strong>{{ req.job.task_type }}</strong>
+              <div class="muted">{{ req.job.schedule_start|date:"D, M j, g:i A" }} &middot; {{ req.provider.user.username }} wants this job</div>
             </div>
             <div>
               <span class="job-status job-pending">Waiting on you</span>
-              <form method="post" action="{% url 'booking:decline' job.pk %}" style="display:inline">
+              <form method="post" action="{% url 'booking:decline' req.pk %}" style="display:inline">
                 {% csrf_token %}<button type="submit">Decline</button>
               </form>
-              <form method="post" action="{% url 'booking:confirm' job.pk %}" style="display:inline">
+              <form method="post" action="{% url 'booking:confirm' req.pk %}" style="display:inline">
                 {% csrf_token %}<button type="submit">Accept</button>
               </form>
             </div>
@@ -58,7 +58,7 @@
             </div>
           </div>
         {% endfor %}
-        {% if not pending_jobs and not open_jobs %}
+        {% if not pending_reqs and not open_jobs %}
           <p>Nothing waiting. <a href="{% url 'booking:post_job' %}">Post a job</a>.</p>
         {% endif %}
         <p><a href="{% url 'members:seeker_profile' %}">Manage posts</a></p>

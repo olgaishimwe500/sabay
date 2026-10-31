@@ -8,7 +8,8 @@ from django.views.decorators.http import require_POST
 from members.models import Seeker
 
 from .forms import JobPostForm
-from .models import JobPost
+from .models import JobPost, JobReq
+
 
 
 # Create your views here.
@@ -39,17 +40,15 @@ def job_detail(request, pk):
 @login_required
 @require_POST
 def confirm(request, pk):
-    job = get_object_or_404(JobPost, pk=pk, seeker__user=request.user, status="pending")
-    job.status = "accepted"
-    job.save()
-    return redirect("booking:job_detail", pk=pk)
+    req= get_object_or_404(JobReq, pk=pk, job__seeker__user=request.user, status="pending", job__status="open")
+    req.approve()
+    return redirect("members:seeker_dashboard")
 
 @login_required
 @require_POST
 def decline(request, pk):
-    job = get_object_or_404(JobPost, pk=pk, seeker__user=request.user, status="pending")
-    job.provider = None
-    job.status = "open"
-    job.save()
-    return redirect("booking:job_detail", pk=pk)
+    req = get_object_or_404(JobReq, pk=pk, job__seeker__user=request.user, status="pending", job__status="open")
+    req.status = "declined"
+    req.save()
+    return redirect("members:seeker_dashboard")
 
