@@ -40,6 +40,7 @@ class JobPost(models.Model):
 class JobReq(models.Model):
     job = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name="applications")
     provider = models.ForeignKey(Provider, on_delete=models.CASCADE, related_name="applications")
+    dismissed = models.BooleanField(default=False)
     status = models.CharField(
         max_length=20,
         choices=[

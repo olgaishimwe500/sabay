@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from booking.models import JobPost
+from booking.models import JobPost, JobReq
 
 from .models import Cert, Provider, ProviderCert, Seeker, Specialty
 
@@ -115,3 +115,81 @@ class JobResponseTest(TestCase):
 
         self.job.refresh_from_db()
         self.assertEqual(self.job.status, "declined")
+
+
+class JobRequestButtonTest(TestCase):
+    def setUp(self):
+        self.john = User.objects.create_user(username="john", password="password")
+        self.provider = Provider.objects.create(user=self.john)
+
+        self.ana = User.objects.create_user(username="ana", password="password")
+        self.seeker = Seeker.objects.create(user=self.ana)
+
+        start = timezone.now() + timedelta(days=1)
+        self.job = JobPost.objects.create(
+            seeker=self.seeker,
+            status="open",
+            task_type="Cleaning",
+            address="123 Test St",
+            schedule_start=start,
+            schedule_end=start + timedelta(hours=2),
+        )
+        self.url = reverse("members:job_request", args=[self.job.id])
+
+    def test_request_creates_job_req(self):
+        self.client.login(username="john", password="password")
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(
+            JobReq.objects.filter(job=self.job, provider=self.provider).exists()
+        )
+
+    def test_request_twice_only_creates_one(self):
+        self.client.login(username="john", password="password")
+        self.client.post(self.url)
+        self.client.post(self.url)
+
+        self.assertEqual(
+            JobReq.objects.filter(job=self.job, provider=self.provider).count(), 1
+        )
+
+
+class DismissRequestButtonTest(TestCase):
+    def setUp(self):
+        self.john = User.objects.create_user(username="john", password="password")
+        self.provider = Provider.objects.create(user=self.john)
+
+        self.ana = User.objects.create_user(username="ana", password="password")
+        self.seeker = Seeker.objects.create(user=self.ana)
+
+        start = timezone.now() + timedelta(days=1)
+        self.job = JobPost.objects.create(
+            seeker=self.seeker,
+            status="open",
+            task_type="Cleaning",
+            address="123 Test St",
+            schedule_start=start,
+            schedule_end=start + timedelta(hours=2),
+        )
+        self.url = reverse("members:dismiss_request", args=[self.job.id])
+
+    def test_dismiss_declined_request(self):
+        job_req = JobReq.objects.create(
+            job=self.job, provider=self.provider, status="declined"
+        )
+        self.client.login(username="john", password="password")
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 302)
+        job_req.refresh_from_db()
+        self.assertTrue(job_req.dismissed)
+
+    def test_cannot_dismiss_pending_request(self):
+        job_req = JobReq.objects.create(job=self.job, provider=self.provider)
+        self.client.login(username="john", password="password")
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 404)
+        job_req.refresh_from_db()
+        self.assertFalse(job_req.dismissed)

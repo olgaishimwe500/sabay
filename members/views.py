@@ -106,10 +106,12 @@ def dashboard(request):
             job=OuterRef("pk"), provider=provider
         ).values("status")[:1]
 
+        dismissed_jobs = JobReq.objects.filter(provider=provider, dismissed=True).values("job_id")
         open_jobs = (
             JobPost.objects.select_related("seeker__user")
             .filter(status="open", provider__isnull=True)
             .exclude(applications__provider=provider, applications__status="approved")
+            .exclude(pk__in=dismissed_jobs)
             .annotate(my_status=Subquery(my_request_status))
             .order_by("-created_at")
         )
@@ -163,4 +165,22 @@ def job_request(request, job_id):
         return redirect("home")
     job = get_object_or_404(JobPost, pk=job_id, status="open", provider__isnull=True)
     JobReq.objects.get_or_create(job=job, provider=provider)
+    return redirect("dashboard")
+
+
+"""
+This function will dismiss the job if the provider is not 
+selected by the seeker in a job request
+"""
+
+@login_required
+@require_POST
+def dismiss_request(request, job_id):
+    provider = getattr(request.user, "provider_profile", None)
+    if provider is None:
+        return redirect("home")
+
+    job_req = get_object_or_404(JobReq, job_id=job_id, provider=provider, status="declined")
+    job_req.dismissed = True
+    job_req.save(update_fields=["dismissed"])
     return redirect("dashboard")
