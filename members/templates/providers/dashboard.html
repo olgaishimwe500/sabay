@@ -27,36 +27,43 @@
 		</div>
 		{% endif %}
 	</div>
-	<div class="job-container">
-		<div class="job-header">
-			<h2>Booking requests </h2>
-			{% if booking_requests_count > 5 %}
-				<a href="">View all</a>
-			{% endif %}
+	<div class="dash-main-container">
+		<div class="job-section-container">
+			<div class="job-container">
+				<div class="job-header">
+					<h2>Booking requests </h2>
+					{% if booking_requests_count > 5 %}
+						<a href="">View all</a>
+					{% endif %}
+				</div>
+				<div class="job-cards">
+					{% include "providers/partials/_booking_reqs.html#booking-req" %}
+				</div>
+
+			</div>
+			<div class="job-container">
+				<div class="job-header">
+					<h2>Upcoming Jobs </h2>
+				</div>
+				<div class="job-cards">
+					{% include "providers/partials/_upcoming_jobs.html#upcoming-jobs" %}
+				</div>
+
+			</div>
+			<div class="job-container">
+				<div class="job-header">
+					<h2>Open Jobs </h2>
+				</div>
+				<div class="job-cards">
+					{% include "providers/partials/_open_jobs.html#open-jobs" %}
+				</div>
+			</div>
 		</div>
-		<div class="job-cards">
-			{% include "providers/partials/_booking_reqs.html#booking-req" %}
+		<div class="side-info-container">
+			{% include "providers/partials/_profile_card.html#profile_card" %}
 		</div>
 
 	</div>
-	<div class="job-container">
-		<div class="job-header">
-			<h2>Upcoming Jobs </h2>
-		</div>
-		<div class="job-cards">
-			{% include "providers/partials/_upcoming_jobs.html#upcoming-jobs" %}
-		</div>
-
-	</div>
-	<div class="job-container">
-		<div class="job-header">
-			<h2>Open Jobs </h2>
-		</div>
-		<div class="job-cards">
-			{% include "providers/partials/_open_jobs.html#open-jobs" %}
-		</div>
-		</div>
-
-	</div>
+</div>
 </div>
 {% endblock %}
