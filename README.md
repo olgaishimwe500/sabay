@@ -43,3 +43,8 @@ Enable git hooks for auto-formatting on commit using `Ruff`.
 ```bash
 git config --local core.hooksPath .githooks
 ```
+
+## Production deployment
+
+See [the VPS deployment guide](docs/production-deployment.md) for the manual GitHub
+Actions workflow, restricted SSH setup, server script, and production rollout steps.

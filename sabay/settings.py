@@ -16,7 +16,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
@@ -25,7 +24,7 @@ SECRET_KEY = "django-insecure-dn66da_8b!9tl95v9c((1-%@3f(@fzn51b0fu4-q)l9a!l(#l7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["100.70.173.44", "100.80.147.45", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["100.70.173.44", "sabay.org", "localhost", "127.0.0.1"]
 
 
 # Application definition
@@ -79,12 +78,9 @@ ASGI_APPLICATION = "sabay.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {
-        # "BACKEND": "channels_redis.core.RedisChannelLayer",
         "BACKEND": "channels.layers.InMemoryChannelLayer",
-        "CONFIG": {
-            # "hosts": [{"address": "redis://redis:6379", "socket_timeout": None}],
-        },
-    },
+        "CONFIG": {},
+    }
 }
 
 # Database

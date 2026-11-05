@@ -4,6 +4,8 @@
 {% block content %}
 <div class=login-container">
 	<h2>Log In</h2>
+	{% if messages %}
+{% endif %}
 	<form method="post">
 		{% csrf_token %}
 		<div>

@@ -18,6 +18,8 @@ main {
 	padding-inline: 1.5rem;
 	display: flex;
 	justify-content: center;
+	flex-direction: column;
+	align-items: center;
 }
 
 /* Navigation custom rules */
