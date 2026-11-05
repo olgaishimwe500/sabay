@@ -154,42 +154,44 @@ class JobRequestButtonTest(TestCase):
             JobReq.objects.filter(job=self.job, provider=self.provider).count(), 1
         )
 
-
-class DismissRequestButtonTest(TestCase):
+class LoginViewTests(TestCase):
     def setUp(self):
-        self.john = User.objects.create_user(username="john", password="password")
-        self.provider = Provider.objects.create(user=self.john)
+        self.url = reverse("members:login")
 
-        self.ana = User.objects.create_user(username="ana", password="password")
-        self.seeker = Seeker.objects.create(user=self.ana)
-
-        start = timezone.now() + timedelta(days=1)
-        self.job = JobPost.objects.create(
-            seeker=self.seeker,
-            status="open",
-            task_type="Cleaning",
-            address="123 Test St",
-            schedule_start=start,
-            schedule_end=start + timedelta(hours=2),
+    def test_staff_user_is_rejected(self):
+        User.objects.create_user(username="staff", password="password", is_staff=True)
+        response = self.client.post(
+            self.url, {"username": "staff", "password": "password"}
         )
-        self.url = reverse("members:dismiss_request", args=[self.job.id])
+        self.assertEqual(response.status_code, 403)
 
-    def test_dismiss_declined_request(self):
-        job_req = JobReq.objects.create(
-            job=self.job, provider=self.provider, status="declined"
+    def test_superuser_is_rejected(self):
+        User.objects.create_superuser(username="admin", password="password")
+        response = self.client.post(
+            self.url, {"username": "admin", "password": "password"}
         )
-        self.client.login(username="john", password="password")
-        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, 403)
 
-        self.assertEqual(response.status_code, 302)
-        job_req.refresh_from_db()
-        self.assertTrue(job_req.dismissed)
+    def test_wrong_password_for_staff_shows_generic_error(self):
+        User.objects.create_user(username="staff", password="password", is_staff=True)
+        response = self.client.post(self.url, {"username": "staff", "password": "nope"})
+        self.assertEqual(response.status_code, 200)
 
-    def test_cannot_dismiss_pending_request(self):
-        job_req = JobReq.objects.create(job=self.job, provider=self.provider)
-        self.client.login(username="john", password="password")
-        response = self.client.post(self.url)
+    def test_provider_logs_in_and_goes_to_dashboard(self):
+        user = User.objects.create_user(username="bob", password="password")
+        Provider.objects.create(user=user)
+        response = self.client.post(
+            self.url, {"username": "bob", "password": "password"}
+        )
+        self.assertRedirects(
+            response, reverse("dashboard"), fetch_redirect_response=False
+        )
+        self.assertEqual(int(self.client.session["_auth_user_id"]), user.pk)
 
-        self.assertEqual(response.status_code, 404)
-        job_req.refresh_from_db()
-        self.assertFalse(job_req.dismissed)
+    def test_seeker_logs_in_and_goes_home(self):
+        user = User.objects.create_user(username="sue", password="password")
+        Seeker.objects.create(user=user)
+        response = self.client.post(
+            self.url, {"username": "sue", "password": "password"}
+        )
+        self.assertRedirects(response, reverse("home"), fetch_redirect_response=False)

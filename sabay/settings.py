@@ -24,7 +24,7 @@ SECRET_KEY = "django-insecure-dn66da_8b!9tl95v9c((1-%@3f(@fzn51b0fu4-q)l9a!l(#l7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["sabay.org", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["100.70.173.44", "sabay.org", "localhost", "127.0.0.1"]
 
 
 # Application definition

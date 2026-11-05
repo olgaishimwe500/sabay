@@ -215,6 +215,7 @@ form {
 	}
 	.accept-container{
 		padding-inline: 0px;
+		width:100%;
 	}
 
 	.job-card{
