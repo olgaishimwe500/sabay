@@ -1,0 +1,21 @@
+[Unit]
+Description=Sabay Django HTTP (Gunicorn)
+After=network.target
+
+[Service]
+User=sabay
+Group=sabay
+WorkingDirectory=/home/sabay/app
+EnvironmentFile=/etc/sabay/app.env
+Environment=PYENV_ROOT=/home/sabay/.pyenv
+Environment=PATH=/home/sabay/.pyenv/shims:/home/sabay/.pyenv/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/bin/bash -c 'export PYENV_VERSION="$(/home/sabay/.pyenv/bin/pyenv global)"; exec /home/sabay/.pyenv/bin/pyenv exec gunicorn --bind 127.0.0.1:8000 --workers 2 --access-logfile - --error-logfile - sabay.wsgi:application'
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=45
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
