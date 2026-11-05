@@ -1,4 +1,4 @@
-from django.db import models , transaction
+from django.db import models, transaction
 
 from members.models import Provider, Seeker
 
@@ -37,9 +37,14 @@ class JobPost(models.Model):
     recurrence_rule = models.CharField(max_length=20, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+
 class JobReq(models.Model):
-    job = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name="applications")
-    provider = models.ForeignKey(Provider, on_delete=models.CASCADE, related_name="applications")
+    job = models.ForeignKey(
+        JobPost, on_delete=models.CASCADE, related_name="applications"
+    )
+    provider = models.ForeignKey(
+        Provider, on_delete=models.CASCADE, related_name="applications"
+    )
     dismissed = models.BooleanField(default=False)
     status = models.CharField(
         max_length=20,
@@ -54,6 +59,7 @@ class JobReq(models.Model):
     """
     Allows seekers to approve a request
     """
+
     def approve(self):
         with transaction.atomic():
             self.status = "approved"
@@ -64,9 +70,13 @@ class JobReq(models.Model):
             job.status = "accepted"
             job.save()
 
-            type(self).objects.filter(job=job).exclude(pk=self.pk).update(status="declined")
+            type(self).objects.filter(job=job).exclude(pk=self.pk).update(
+                status="declined"
+            )
+
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["job", "provider"], name="one_application_per_provider")
+            models.UniqueConstraint(
+                fields=["job", "provider"], name="one_application_per_provider"
+            )
         ]
-

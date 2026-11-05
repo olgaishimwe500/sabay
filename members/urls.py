@@ -30,5 +30,9 @@ urlpatterns = [
     path("profile/edit/", seeker_views.seeker_profile_edit, name="seeker_profile_edit"),
     path("job-response/<int:job_id>/", views.job_response, name="job_response"),
     path("jobs/<int:job_id>/request/", views.job_request, name="job_request"),
-    path("jobs/<int:job_id>/dismiss_request/", views.dismiss_request, name="dismiss_request"),
+    path(
+        "jobs/<int:job_id>/dismiss_request/",
+        views.dismiss_request,
+        name="dismiss_request",
+    ),
 ]

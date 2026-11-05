@@ -154,6 +154,7 @@ class JobRequestButtonTest(TestCase):
             JobReq.objects.filter(job=self.job, provider=self.provider).count(), 1
         )
 
+
 class LoginViewTests(TestCase):
     def setUp(self):
         self.url = reverse("members:login")

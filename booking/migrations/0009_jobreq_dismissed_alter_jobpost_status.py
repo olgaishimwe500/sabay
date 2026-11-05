@@ -4,20 +4,29 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('booking', '0008_alter_jobpost_status'),
+        ("booking", "0008_alter_jobpost_status"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='jobreq',
-            name='dismissed',
+            model_name="jobreq",
+            name="dismissed",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='jobpost',
-            name='status',
-            field=models.CharField(choices=[('open', 'Open'), ('accepted', 'Accepted'), ('declined', 'Declined'), ('completed', 'Completed'), ('cancelled', 'Cancelled')], default='open', max_length=20),
+            model_name="jobpost",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("open", "Open"),
+                    ("accepted", "Accepted"),
+                    ("declined", "Declined"),
+                    ("completed", "Completed"),
+                    ("cancelled", "Cancelled"),
+                ],
+                default="open",
+                max_length=20,
+            ),
         ),
     ]

@@ -4,15 +4,14 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('booking', '0006_jobapp'),
-        ('members', '0017_provider_is_provider'),
+        ("booking", "0006_jobapp"),
+        ("members", "0017_provider_is_provider"),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='JobApp',
-            new_name='JobReq',
+            old_name="JobApp",
+            new_name="JobReq",
         ),
     ]
