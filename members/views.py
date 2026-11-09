@@ -96,6 +96,8 @@ def dashboard(request):
     if hasattr(request.user, "provider_profile"):
         provider = getattr(request.user, "provider_profile", None)
         now = timezone.now()
+        # Hide jobs whose start time passed before anyone was accepted
+        JobPost.objects.expire_past_due(now)
         booking_requests = (
             JobPost.objects.select_related("seeker__user")
             .filter(status="open", provider=provider)
@@ -173,7 +175,13 @@ def job_request(request, job_id):
     provider = getattr(request.user, "provider_profile", None)
     if provider is None:
         return redirect("home")
-    job = get_object_or_404(JobPost, pk=job_id, status="open", provider__isnull=True)
+    job = get_object_or_404(
+        JobPost,
+        pk=job_id,
+        status="open",
+        provider__isnull=True,
+        schedule_start__gt=timezone.now(),
+    )
     JobReq.objects.get_or_create(job=job, provider=provider)
     return redirect("dashboard")
 

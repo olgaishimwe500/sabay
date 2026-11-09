@@ -1,9 +1,22 @@
 from django.db import models, transaction
+from django.utils import timezone
 
 from members.models import Provider, Seeker
 
 # Create your models here.
 ##model for job postings. different from location.seeker or location.employee'
+
+
+class JobPostQuerySet(models.QuerySet):
+    def expire_past_due(self, now=None):
+        """
+        Marks open jobs as expired once their start time has passed without
+        a provider being accepted. Returns the number of jobs expired.
+        """
+        now = now or timezone.now()
+        return self.filter(status="open", schedule_start__lte=now).update(
+            status="expired"
+        )
 
 
 class JobPost(models.Model):
@@ -30,12 +43,15 @@ class JobPost(models.Model):
             ("declined", "Declined"),
             ("completed", "Completed"),
             ("cancelled", "Cancelled"),
+            ("expired", "Expired"),
         ],
         default="open",
     )
     is_recurring = models.BooleanField(default=False)
     recurrence_rule = models.CharField(max_length=20, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = JobPostQuerySet.as_manager()
 
 
 class JobReq(models.Model):

@@ -22,11 +22,13 @@ def post_job(request):
 
 @login_required
 def job_list(request):
+    JobPost.objects.expire_past_due()
     jobs = JobPost.objects.select_related("seeker__user").order_by("-created_at")
     return render(request, "booking/job_list.html", {"jobs": jobs})
 
 
 @login_required
 def job_detail(request, pk):
+    JobPost.objects.expire_past_due()
     job = get_object_or_404(JobPost.objects.select_related("seeker__user"), pk=pk)
     return render(request, "booking/job_detail.html", {"job": job})
