@@ -11,6 +11,7 @@ from django.views.decorators.http import require_POST
 from booking.models import JobPost, JobReq
 
 from .cities import CITIES
+from .forms import ProviderCertForm, ProviderPictureForm, ProviderProfileForm
 
 """
 Decided to use a custom login view
@@ -196,3 +197,138 @@ def dismiss_request(request, job_id):
     job_req.dismissed = True
     job_req.save(update_fields=["dismissed"])
     return redirect("dashboard")
+
+
+"""
+This will render the providers profile and will
+allow them to edit it
+"""
+
+
+@login_required
+def provider_profile_edit(request):
+    provider = getattr(request.user, "provider_profile", None)
+    if provider is None:
+        return redirect("home")
+    return render_provider_profile(request, provider)
+
+
+def render_provider_profile(
+    request,
+    provider,
+    picture_form=None,
+    profile_form=None,
+    cert_form=None,
+    status=200,
+):
+    """
+    Renders the provider's edit profile page. Views that fail validation
+    pass in their bound form so its errors show up on the page.
+    """
+    return render(
+        request,
+        "providers/profile.html",
+        {
+            "provider": provider,
+            "picture_form": picture_form or ProviderPictureForm(),
+            "profile_form": profile_form or ProviderProfileForm(instance=provider),
+            "cert_form": cert_form or ProviderCertForm(provider=provider),
+            "certifications": provider.certifications.select_related("cert").order_by(
+                "cert__name"
+            ),
+        },
+        status=status,
+    )
+
+
+"""
+Uploads a new profile picture for the provider.
+- the form's ImageField makes sure the upload is a real image
+- the old picture file is removed so it doesn't pile up in media/
+"""
+
+
+@login_required
+@require_POST
+def add_profile_picture(request):
+    provider = getattr(request.user, "provider_profile", None)
+    if provider is None:
+        return redirect("home")
+
+    old_picture = provider.profilePicture.name if provider.profilePicture else None
+    form = ProviderPictureForm(request.POST, request.FILES, instance=provider)
+    if not form.is_valid():
+        # Reload the current picture since the failed form changed the instance
+        provider.refresh_from_db()
+        return render_provider_profile(request, provider, picture_form=form, status=400)
+
+    form.save()
+    if old_picture and old_picture != provider.profilePicture.name:
+        provider.profilePicture.storage.delete(old_picture)
+    return redirect("members:provider_profile_edit")
+
+
+"""
+Removes the provider's profile picture and deletes the file.
+"""
+
+
+@login_required
+@require_POST
+def remove_profile_picture(request):
+    provider = getattr(request.user, "provider_profile", None)
+    if provider is None:
+        return redirect("home")
+
+    if provider.profilePicture:
+        # delete() removes the file from storage and saves the model
+        provider.profilePicture.delete(save=False)
+        provider.profilePicture = None
+        provider.save(update_fields=["profilePicture"])
+    return redirect("members:provider_profile_edit")
+
+
+"""
+Saves the provider profile page: city, bio,
+whether they are accepting new jobs, and their specialties.
+"""
+
+
+@login_required
+@require_POST
+def update_provider_profile(request):
+    provider = getattr(request.user, "provider_profile", None)
+    if provider is None:
+        return redirect("home")
+
+    form = ProviderProfileForm(request.POST, instance=provider)
+    if not form.is_valid():
+        provider.refresh_from_db()
+        return render_provider_profile(request, provider, profile_form=form, status=400)
+
+    form.save()
+    return redirect("members:provider_profile_edit")
+
+
+"""
+Uploads a certificate (photo or PDF) for the provider.
+- new certificates always start unverified until an admin reviews them
+"""
+
+
+@login_required
+@require_POST
+def add_certificate(request):
+    provider = getattr(request.user, "provider_profile", None)
+    if provider is None:
+        return redirect("home")
+
+    form = ProviderCertForm(request.POST, request.FILES, provider=provider)
+    if not form.is_valid():
+        return render_provider_profile(request, provider, cert_form=form, status=400)
+
+    provider_cert = form.save(commit=False)
+    provider_cert.provider = provider
+    provider_cert.is_verified = False
+    provider_cert.save()
+    return redirect("members:provider_profile_edit")

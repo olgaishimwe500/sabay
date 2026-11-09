@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block page_heading %}Profile{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href={% static 'providers/css/profile.css' %}>
+{% endblock %}
+
+{% block content %}
+<div class="profile">
+	<div class="heading">
+		<h1>Edit profile</h1>
+	</div>
+	<div class="about-you-container">
+		{% include "providers/partials/_bio_card.html#bio" %}
+	</div>
+
+	<section class="about-you-container" aria-labelledby="work-heading">
+		{% include "providers/partials/_work_card.html#work-card" %}
+	</section>
+
+	<div class="profile-actions">
+		<a href="{% url 'dashboard' %}">Cancel</a>
+		<button type="submit" form="provider-profile-form">Save changes</button>
+	</div>
+</div>
+{% endblock %}

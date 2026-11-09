@@ -56,6 +56,6 @@
 		{% endif %}
 		{% endwith %}
 	</div>
-	<button class="edit-profile">Edit Profile</button>
+	<a href="{% url 'members:provider_profile_edit' %}" ><button class="edit-profile">Edit Profile</button></a>
 </div>
 {% endpartialdef %}
