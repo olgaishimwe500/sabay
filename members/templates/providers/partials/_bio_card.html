@@ -1,0 +1,77 @@
+{% load static %}
+
+{% partialdef bio %}
+<h2>About you</h2>
+<div class="pfp-container">
+	<div class="profile-img-container">
+		{% if provider.profilePicture %}
+		<img src="{{ provider.profilePicture.url }}" alt="{{ provider.user.get_full_name }}'s profile picture">
+		{% else %}
+		<span class="profile-initials" aria-hidden="true">{{ provider.user.first_name|first|upper }}{{ provider.user.last_name|first|upper }}</span>
+		{% endif %}
+	</div>
+	<div class="pfp-actions">
+		<form method="post" action="{% url 'members:add_profile_picture' %}" enctype="multipart/form-data">
+			{% csrf_token %}
+			<label for="{{ picture_form.profilePicture.id_for_label }}">Choose a photo</label>
+			{{ picture_form.profilePicture }}
+			{% for error in picture_form.profilePicture.errors %}
+			<p class="form-error" role="alert">{{ error }}</p>
+			{% endfor %}
+			<button type="submit">Upload</button>
+		</form>
+
+		{% if provider.profilePicture %}
+		<form method="post" action="{% url 'members:remove_profile_picture' %}">
+			{% csrf_token %}
+			<button type="submit" class="remove-pfp">Remove</button>
+		</form>
+		{% endif %}
+	</div>
+</div>
+<div class="personal-info-container">
+	<div class="names-container">
+		<div class="first-name">
+			<h3>First name</h3>
+			<label>
+				<input type="text" value="{{ provider.user.first_name }}" readonly>
+			</label>
+		</div>
+		<div class="last-name">
+			<h3>Last name</h3>
+			<label>
+				<input type="text" value="{{ provider.user.last_name }}" readonly>
+			</label>
+		</div>
+
+
+		
+	</div>
+</div>
+<div class="location-container">
+		<div class="location">
+			<label for="{{ profile_form.city.id_for_label }}"><h3>City</h3></label>
+			{{ profile_form.city }}
+			{% for error in profile_form.city.errors %}
+			<p class="form-error" role="alert">{{ error }}</p>
+			{% endfor %}
+		</div>
+		<div class="location">
+			<h3>State</h3>
+			<label>
+				<input type="text" value="Oregon" readonly>
+			</label>
+		</div>
+
+
+		
+</div>
+<div class="bio-container">
+	<label for="{{ profile_form.bio.id_for_label }}"><h3>Bio</h3></label>
+	{{ profile_form.bio }}
+	{% for error in profile_form.bio.errors %}
+	<p class="form-error" role="alert">{{ error }}</p>
+	{% endfor %}
+</div>
+{% endpartialdef %}
+

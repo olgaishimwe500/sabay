@@ -26,6 +26,10 @@
 				<span class="job-req-status pending">Requested &middot; waiting on seeker</span>
 			{% elif job.my_status == "declined" %}
 				<span class="job-req-status declined">Not selected</span>
+				<form method="post" action="{% url 'members:dismiss_request' job.id %}" class="dismiss-form">
+					{% csrf_token %}
+					<button type="submit" name="action" class="icon-btn" aria-label="Remove from list" title="Remove">✕</button>
+				</form>	
 			{% else %}
 				<form method="post" action={% url "members:job_request" job.id %}>
 					{% csrf_token %}

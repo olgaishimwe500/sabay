@@ -1,0 +1,73 @@
+{% load static %}
+
+{% partialdef work-card %}
+<div class="work-header">
+	<div>
+		<h2 id="work-heading">Work</h2>
+	</div>
+	<div class="accept-container">
+		<label for="{{ profile_form.is_available.id_for_label }}">{{ profile_form.is_available.label }}</label>
+		<label class="switch">
+			{{ profile_form.is_available }}
+			<span class="slider round"></span>
+		</label>
+	</div>
+</div>
+
+<form id="provider-profile-form" method="post" action="{% url 'members:update_provider_profile' %}">
+	{% csrf_token %}
+	{{ profile_form.non_field_errors }}
+	<fieldset class="specialties">
+		<legend><h3>Specialties</h3></legend>
+		{{ profile_form.specialties }}
+		{% for error in profile_form.specialties.errors %}
+		<p class="form-error" role="alert">{{ error }}</p>
+		{% endfor %}
+	</fieldset>
+</form>
+
+<div class="certificates">
+	<h3>Certificates</h3>
+	{% if certifications %}
+	<ul class="cert-list">
+		{% for provider_cert in certifications %}
+		<li>
+			<div>
+				<strong>{{ provider_cert.cert.name }}</strong>
+				<p>
+					{{ provider_cert.issuer }}
+					{% if provider_cert.expires %}&middot; expires {{ provider_cert.expires|date:"M Y" }}{% endif %}
+				</p>
+			</div>
+			{% if provider_cert.is_verified %}
+			<span class="cert-status verified">Verified</span>
+			{% else %}
+			<span class="cert-status pending">In review</span>
+			{% endif %}
+		</li>
+		{% endfor %}
+	</ul>
+	{% else %}
+	<p class="profile-empty">No certificates added yet.</p>
+	{% endif %}
+
+	<details class="add-certificate"{% if cert_form.errors %} open{% endif %}>
+		<summary>+ Add certificate</summary>
+		<form method="post" action="{% url 'members:add_certificate' %}" enctype="multipart/form-data">
+			{% csrf_token %}
+			{{ cert_form.non_field_errors }}
+			{% for field in cert_form %}
+			<div class="cert-field">
+				<label for="{{ field.id_for_label }}">{{ field.label }}</label>
+				{{ field }}
+				{% for error in field.errors %}
+				<p class="form-error" role="alert">{{ error }}</p>
+				{% endfor %}
+			</div>
+			{% endfor %}
+			<button type="submit">Upload certificate</button>
+		</form>
+	</details>
+</div>
+
+{% endpartialdef %}

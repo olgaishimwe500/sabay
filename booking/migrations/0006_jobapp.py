@@ -5,24 +5,60 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('booking', '0005_alter_jobpost_status'),
-        ('members', '0017_provider_is_provider'),
+        ("booking", "0005_alter_jobpost_status"),
+        ("members", "0017_provider_is_provider"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='JobApp',
+            name="JobApp",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(choices=[('pending', 'Pending'), ('approved', 'Approved'), ('declined', 'Declined')], default='pending', max_length=20)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('job', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='applications', to='booking.jobpost')),
-                ('provider', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='applications', to='members.provider')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("approved", "Approved"),
+                            ("declined", "Declined"),
+                        ],
+                        default="pending",
+                        max_length=20,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "job",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="applications",
+                        to="booking.jobpost",
+                    ),
+                ),
+                (
+                    "provider",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="applications",
+                        to="members.provider",
+                    ),
+                ),
             ],
             options={
-                'constraints': [models.UniqueConstraint(fields=('job', 'provider'), name='one_application_per_provider')],
+                "constraints": [
+                    models.UniqueConstraint(
+                        fields=("job", "provider"), name="one_application_per_provider"
+                    )
+                ],
             },
         ),
     ]

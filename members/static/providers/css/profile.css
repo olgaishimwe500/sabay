@@ -1,0 +1,284 @@
+.profile{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 50%;
+	margin-top:5rem;
+}
+.heading{
+	width: 100%;
+	display: flex;
+}
+
+.heading h1 {
+	font-size: 2.5rem !important;
+}
+
+.about-you-container{
+	width: 100%;
+	background: var(--accent-bg);
+	border: var(--border-width) solid var(--border);
+	border-radius: 12px;
+	padding: 1.5rem;
+}
+
+.about-you-container h2{
+	font-size:2rem;
+	margin-top:0;
+}
+
+.profile-img-container{
+	width: 150px;
+	height: 150px;
+	display: flex;
+	flex-shrink: 0;
+	justify-content: center;
+	align-items: center;
+	border-radius: 50%;
+	background: var(--bg);
+	border: var(--border-width) solid var(--border);
+	overflow: hidden;
+}
+
+.profile-img-container img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+.pfp-container{
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 1.5rem;
+}
+
+.pfp-actions form{
+	margin: 0 0 0.75rem 0;
+}
+
+.pfp-actions label{
+	display: block;
+	font-weight: bold;
+}
+
+.form-error{
+	color: var(--code, #d33);
+	margin: 0.25rem 0;
+}
+
+.remove-pfp{
+	background: var(--bg);
+	color: var(--text);
+	border: var(--border-width) solid var(--border);
+}
+
+.names-container{
+	display: flex;
+	gap:10%;
+}
+
+.names-container input{
+	width:100%;
+}
+
+.first-name, .last-name{
+	width: 100%;
+}
+
+.location-container{
+	display: flex;
+	gap:10%;
+}
+
+.location{
+	width: 100%;
+}
+
+.location input{
+	width: 100%;
+}
+
+.location-container h3{
+	margin-top: 2rem;
+}
+
+.bio-container textarea{
+	height: 230px;
+	width: 100%;
+}
+
+.accept-container{
+	display:flex;
+	/*flex-direction: row-reverse;*/
+	width: 300px;
+    	align-items: center;
+	justify-content: space-between;
+	padding-inline: 20px;
+}
+
+.accept-container p,
+.accept-container > label:not(.switch) {
+	font-weight: bold;
+
+}
+/* Accepting jobs toggle button */
+.switch {
+	position: relative;
+	display: inline-block;
+	width: 55px;
+	height: 29px;
+}
+
+.switch input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: var(--border);
+	-webkit-transition: .4s;
+	transition: .4s;
+}
+
+.slider:before {
+	position: absolute;
+	content: "";
+	height: 21px;
+	width: 21px;
+	left: 4px;
+	bottom: 4px;
+	background-color: var(--bg);
+	-webkit-transition: .4s;
+	transition: .4s;
+}
+
+input:checked + .slider {
+	background-color: var(--accent);
+}
+
+input:focus-visible + .slider {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}
+
+input:checked + .slider:before {
+	-webkit-transform: translateX(26px);
+	-ms-transform: translateX(26px);
+	transform: translateX(26px);
+}
+
+.slider.round {
+	border-radius: 34px;
+}
+
+.slider.round:before {
+	border-radius: 50%;
+}
+
+.work-header{
+	display: flex;
+	justify-content: space-between;
+}
+
+.cert-list{
+	list-style: none;
+	margin: 0 0 1rem 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.cert-list li{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 1rem;
+	margin: 0;
+	padding: 1rem;
+	background: var(--bg);
+	border: var(--border-width) solid var(--border);
+	border-radius: 8px;
+}
+
+.cert-list li p{
+	margin: 0.25rem 0 0 0;
+	color: var(--text-light);
+}
+
+.cert-status{
+	flex-shrink: 0;
+	padding: 0.2rem 0.6rem;
+	border-radius: 6px;
+	font-size: 0.85rem;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.cert-status.verified{
+	background: color-mix(in srgb, var(--accent) 18%, transparent);
+	color: var(--accent);
+}
+
+.cert-status.pending{
+	background: #fbe9d7;
+	color: #8a4a12;
+}
+
+.profile-actions{
+	width: 100%;
+	display: flex;
+	justify-content: end;
+}
+
+.profile-actions a{
+	align-content: center;
+
+}
+
+.profile-actions button{
+	margin-left: 1.5rem;
+}
+
+/* mobile  */
+@media (max-width: 1300px){
+	.profile{
+		width: 80%;
+	}
+}
+
+@media (max-width: 500px){
+	.profile{
+		width: 100%;
+	}
+	.pfp-actions button{
+		margin-top:1rem;
+		width: 100%;
+	}
+	.pfp-actions label{
+		margin-top: 2rem;
+	}
+	.names-container{
+		flex-wrap: wrap;
+		gap: 0px;
+		margin-top: 2rem;
+	}
+	.names-container h3{
+		margin-top: .25rem;
+	}
+	.first-name, .last-name{
+		width:100%;
+	}
+
+
+} 

@@ -1,0 +1,61 @@
+{% load static %}
+
+{% partialdef profile_card %}
+<div class="profile-container">
+	<div class="profile-info">
+		<div class="profile-card-img-container">
+			{% if provider.profilePicture %}
+			<img src="{{ provider.profilePicture.url }}" alt="{{ provider.user.get_full_name }}'s profile picture">
+			{% else %}
+			<span class="profile-initials" aria-hidden="true">{{ provider.user.first_name|first|upper }}{{ provider.user.last_name|first|upper }}</span>
+			{% endif %}
+		</div>
+		<div class="profile-card-info">
+			<span>{{ provider.user.get_full_name }}</span>
+			{% if provider.city %}
+			<p>{{ provider.city }}</p>
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="profile-section">
+		<h3>Specialties</h3>
+		{% with specialties=provider.specialties.all %}
+		{% if specialties %}
+		<ul class="profile-pills">
+			{% for specialty in specialties %}
+			<li>{{ specialty  }}</li>
+			{% endfor %}
+		</ul>
+		{% else %}
+		<p class="profile-empty">No specialties added yet.</p>
+		{% endif %}
+		{% endwith %}
+	</div>
+
+	<div class="profile-section">
+		<h3>Certificates</h3>
+		{% with certs=provider.certifications.all %}
+		{% if certs %}
+		<div class="profile-certs-container">
+			<ul class="profile-certs">
+				{% for provider_cert in certs %}
+				<li>
+					<span>{{ provider_cert.cert.name }}</span>
+					{% if provider_cert.is_verified %}
+					<span class="cert-status verified">Verified</span>
+					{% else %}
+					<span class="cert-status pending">In review</span>
+					{% endif %}
+				</li>
+				{% endfor %}
+			</ul>
+		</div>
+		{% else %}
+		<p class="profile-empty">No certificates added yet.</p>
+		{% endif %}
+		{% endwith %}
+	</div>
+	<a href="{% url 'members:provider_profile_edit' %}" ><button class="edit-profile">Edit Profile</button></a>
+</div>
+{% endpartialdef %}
