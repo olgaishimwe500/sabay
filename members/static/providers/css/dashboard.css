@@ -3,7 +3,8 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	width: 75%;
+	width: 100%;
+	max-width: var(--page-width, 1100px);
 }
 
 .greeting {
@@ -117,6 +118,7 @@ input:checked + .slider:before {
 .job-card {
 	width: 100%;
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	gap: 0.75rem;
 	margin-top: 1rem;
@@ -128,12 +130,22 @@ input:checked + .slider:before {
 
 }
 .img-container{
-	width: 50px;
-	height: 50px;
+	width: 56px;
+	height: 56px;
 	display: flex;
 	flex-shrink: 0;
 	justify-content: center;
 	align-items: center;
+	border-radius: 50%;
+	background: var(--blush, #f8ebe2);
+	color: var(--text-light);
+	font-size: 0.7rem;
+	line-height: 1.1;
+	text-align: center;
+	overflow: hidden;
+}
+.img-container p {
+	margin: 0;
 }
 
 .job-card img {
@@ -146,6 +158,7 @@ input:checked + .slider:before {
 
 .ls-card {
 	display: flex;
+	flex: 1 1 20rem;
 	align-items: center;
 	gap: 0.75rem;
 	min-width: 0;
@@ -159,20 +172,29 @@ input:checked + .slider:before {
 
 .options {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 0.75rem;
 	flex-shrink:0;
-	padding-right:.50rem;
+}
+.options button,
+.options .button {
+	margin-bottom: 0;
+}
+.options a.button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .dashboard form {
 	display: contents;
 }
 
-#cancel-btn{
+.options .cancel-btn{
 	background-color: #dc2626;
 	border: solid #dc2626;
 }
-#cancel-btn:hover {
+.options .cancel-btn:hover {
 	background-color: #b91c1c;
 	border-color: #b91c1c;
 }
@@ -180,7 +202,7 @@ input:checked + .slider:before {
 
 .job-req-status {
 	display: inline-block;
-	padding: 0.75rem 2.5rem;
+	padding: 0.6rem 1.25rem;
 	border-radius: 10px;
 	font-size: 0.95rem;
 	font-weight: 600;
@@ -345,6 +367,14 @@ input:checked + .slider:before {
 	margin-top: 1rem;
 	width:100%;
 }
+/* Wide screens: one row per job, details left and actions right */
+@media (min-width: 951px){
+	.options{
+		margin-left: auto;
+		justify-content: flex-end;
+	}
+}
+
 /* Mobile */
 @media (max-width: 950px){
 
@@ -359,6 +389,10 @@ input:checked + .slider:before {
 	.job-card{
 		flex-direction: column;
 		align-items: normal;
+	}
+	/* in a column, the 16rem basis would become a height */
+	.ls-card{
+		flex: 0 1 auto;
 	}
 
 	.dash-main-container{
@@ -375,14 +409,47 @@ input:checked + .slider:before {
 	.dashboard{
 		width: 100%;
 	}
+	.greeting h1 {
+		font-size: 1.75rem !important;
+	}
+	.job-container > * {
+		padding-inline: 1rem;
+	}
+	.job-header {
+		padding-top: 1.25rem;
+	}
+	.job-card {
+		padding: 0.85rem;
+	}
+	.ls-card {
+		align-items: flex-start;
+	}
+	/* Full-width, easy-to-tap buttons in reading order (primary first) */
 	.options{
-		flex-direction: column-reverse;
+		flex-direction: column;
+		width: 100%;
 	}
-	.options button {
-		flex: 0 1 auto;
-		font-size: 1rem;
+	.options button,
+	.options .button {
+		width: 100%;
+		min-height: 48px;
+		font-size: 1.05rem;
 	}
-
+	.job-req-status {
+		white-space: normal;
+		padding: 0.75rem 1rem;
+		text-align: center;
+	}
+	.profile-container {
+		padding: 1rem;
+	}
+	.profile-card-img-container {
+		width: 96px;
+		height: 96px;
+	}
+	.profile-card-info span {
+		font-size: 1.25rem;
+	}
 }
 
 

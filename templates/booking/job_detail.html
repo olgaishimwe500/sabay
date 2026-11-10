@@ -26,7 +26,7 @@
   <p>{{ job.description }}</p>
   {% if job.more_info %}<p>More info: {{ job.more_info }}</p>{% endif %}
 
-  {% if request.user == job.seeker.user or job.status == "confirmed" %}
+  {% if request.user == job.seeker.user or job.status == "accepted" and job.provider.user == request.user %}
     <p>Address: {{ job.address }}</p>
   {% endif %}
 

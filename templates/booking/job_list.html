@@ -1,20 +1,111 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Job board | Sabay{% endblock %}
 
 {% block extra_head %}
-    {% include "booking/job_style.html" %}
+  <link rel="stylesheet" href="{% static 'css/job_board.css' %}">
 {% endblock %}
 
 {% block content %}
-  <h1>Job board</h1>
-  <p><a href="{% url 'booking:post_job' %}"><button type="button">Post a job</button></a></p>
+<div class="job-board{% if has_selection %} has-selection{% endif %}">
+  <header class="board-header">
+    <div>
+      <h1>Job board</h1>
+      <p class="board-subtitle">Open requests from care seekers. Request a job you can take, or view the full details first.</p>
+    </div>
+  </header>
 
-  <div class="job-grid">
-    {% for job in jobs %}
-      {% include "booking/_job_card.html" %}
-    {% empty %}
-      <p>No jobs posted yet.</p>
-    {% endfor %}
+  <p class="board-count">{{ jobs|length }} job{{ jobs|length|pluralize }}</p>
+
+  {% if jobs %}
+  <div class="board-layout">
+    <ul class="board-list" id="job-list" aria-label="Jobs">
+      {% for job in jobs %}
+      <li>
+        <a class="board-card{% if job.pk == selected.pk %} is-selected{% endif %}"
+           href="?job={{ job.pk }}#job-detail"
+           {% if job.pk == selected.pk %}aria-current="true"{% endif %}>
+          <span class="board-card-title">{{ job.task_type }}</span>
+          <span class="board-card-meta">
+            {{ job.schedule_start|date:"D, M j" }} &middot; {{ job.schedule_start|time:"g:i A" }} &ndash; {{ job.schedule_end|time:"g:i A" }} &middot; {% if job.is_recurring %}Recurring{% if job.recurrence_rule %}, {{ job.recurrence_rule|lower }}{% endif %}{% else %}One-time{% endif %}
+          </span>
+          <span class="board-tags">
+            <span class="board-tag status-{{ job.status }}">{{ job.get_status_display }}</span>
+            {% if job.my_status == "pending" %}
+              <span class="board-tag status-requested">You requested</span>
+            {% elif job.my_status == "declined" %}
+              <span class="board-tag status-declined">Not selected</span>
+            {% endif %}
+          </span>
+          <span class="board-card-posted">
+            Posted {{ job.created_at|timesince }} ago by
+            {% if job.seeker.user.first_name %}{{ job.seeker.user.first_name }} {{ job.seeker.user.last_name|first }}{% if job.seeker.user.last_name %}.{% endif %}{% else %}{{ job.seeker.user.username }}{% endif %}
+          </span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+
+    {% with job=selected %}
+    <section class="board-detail" id="job-detail" aria-labelledby="job-detail-title">
+      <a class="board-back" href="#job-list">&larr; Back to all jobs</a>
+
+      <p class="board-eyebrow">{{ job.get_status_display }}</p>
+      <h2 id="job-detail-title">{{ job.task_type }}</h2>
+      <p class="board-detail-posted">Posted {{ job.created_at|timesince }} ago</p>
+
+      <dl class="board-facts">
+        <div>
+          <dt>When</dt>
+          <dd>{{ job.schedule_start|date:"D, M j" }} &middot; {{ job.schedule_start|time:"g:i A" }} &ndash; {{ job.schedule_end|time:"g:i A" }}</dd>
+        </div>
+        <div>
+          <dt>Length</dt>
+          <dd>{{ job.schedule_end|timeuntil:job.schedule_start }}</dd>
+        </div>
+        <div>
+          <dt>Schedule</dt>
+          <dd>{% if job.is_recurring %}Recurring{% if job.recurrence_rule %}, {{ job.recurrence_rule|lower }}{% endif %}{% else %}One-time{% endif %}</dd>
+        </div>
+        <div>
+          <dt>Address</dt>
+          <dd>Shared after confirmation</dd>
+        </div>
+      </dl>
+
+      <h3>About the job</h3>
+      <div class="board-description">{{ job.description|linebreaks }}</div>
+
+      <div class="board-seeker">
+        <span class="board-avatar" aria-hidden="true">{{ job.seeker.user.first_name|first|upper|default:job.seeker.user.username|first|upper }}{{ job.seeker.user.last_name|first|upper }}</span>
+        <div>
+          <strong>{% if job.seeker.user.first_name %}{{ job.seeker.user.first_name }} {{ job.seeker.user.last_name|first }}{% if job.seeker.user.last_name %}.{% endif %}{% else %}{{ job.seeker.user.username }}{% endif %}</strong>
+          <span>Member since {{ job.seeker.user.date_joined|date:"Y" }}</span>
+        </div>
+      </div>
+
+      <div class="board-actions">
+        {% if job.my_status == "pending" %}
+          <span class="board-action-status">Requested &middot; waiting on seeker</span>
+        {% elif job.my_status == "declined" %}
+          <span class="board-action-status">Not selected for this job</span>
+        {% elif job.status == "open" and not job.provider_id and job.schedule_start > now %}
+          <form method="post" action="{% url 'members:job_request' job.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}?job={{ job.pk }}#job-detail">
+            <button type="submit">Request this job</button>
+          </form>
+        {% else %}
+          <span class="board-action-status">No longer taking requests</span>
+        {% endif %}
+        <a class="board-secondary" href="{% url 'booking:job_detail' job.pk %}">View full details</a>
+      </div>
+    </section>
+    {% endwith %}
   </div>
+  {% else %}
+  <p class="board-empty">No jobs posted yet.</p>
+  {% endif %}
+</div>
 {% endblock %}

@@ -2,9 +2,58 @@
  * We're using simple.min.css as our base framework.
  * When adding custom rules make sure to inspect the page and check
  * simple.min.css's rules first. For our custom rules to work we need
- * them to be equal or higher specificity and MUST be loaded after 
+ * them to be equal or higher specificity and MUST be loaded after
  * simple.min.css.
  */
+
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@700&display=swap");
+
+/*
+ * Sabay theme: warm terracotta palette.
+ * Overrides Simple.css variables so every page (and every app stylesheet
+ * that uses var(--accent), var(--bg), ...) picks up the same colors.
+ * This rule loads after Simple.css's dark-mode rule, so the warm light
+ * theme is used regardless of the OS color scheme.
+ */
+:root {
+	color-scheme: light;
+
+	/* Brand palette */
+	--terracotta: #c0704c;        /* decorative only (logo, dots) */
+	--terracotta-strong: #a9573a; /* text/buttons: 5.1:1 on white */
+	--terracotta-dark: #8f4a30;
+	--terracotta-gradient: linear-gradient(135deg, #ad5c3c 0%, #934c31 100%);
+	--cream: #fcf8f5;
+	--blush: #f8ebe2;
+	--sand: #ecdcd0;
+	--cocoa: #2b1f17;
+	--mocha: #7a5a46;
+	--gold: #e0a84a;
+
+	/*
+	 * Shared content width for dashboard, edit profile and job board:
+	 * 1100px on laptops, growing to 75% of the window on big monitors.
+	 * Pages also use width: 100%, so they shrink with smaller screens.
+	 */
+	--page-width: max(1100px, 75vw);
+
+	/* Simple.css variables */
+	--sans-font: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+	--serif-font: "Playfair Display", Georgia, "Times New Roman", serif;
+	--standard-border-radius: 10px;
+	--bg: var(--cream);
+	--accent-bg: #ffffff;
+	--text: var(--cocoa);
+	--text-light: var(--mocha);
+	--border: var(--sand);
+	--accent: var(--terracotta-strong);
+	--accent-hover: var(--terracotta-dark);
+	--accent-text: #ffffff;
+	--code: #b3412e;
+	--preformatted: var(--cocoa);
+	--marked: #f6dfa8;
+	--disabled: #f1e6de;
+}
 
 .width-issue {
 	grid-column: 1 / -1;
@@ -13,6 +62,9 @@
 
 body {
 	display: block;
+	font-family: var(--sans-font);
+	background-color: var(--bg);
+	color: var(--text);
 }
 main {
 	padding-inline: 1.5rem;
@@ -23,12 +75,121 @@ main {
 	align-items: center;
 }
 
+/*
+ * Pages that render a bare .job-grid (e.g. seeker profile) have no wrapper
+ * element, so give each direct child of <main> the shared page width.
+ */
+main:has(> .job-grid) > * {
+	width: 100%;
+	max-width: var(--page-width);
+}
+
+/* Typography */
+h1, h2 {
+	font-family: var(--serif-font);
+	font-weight: 700;
+	color: var(--text);
+	letter-spacing: -0.01em;
+}
+h3, h4, h5, h6 {
+	font-family: var(--sans-font);
+	font-weight: 700;
+	color: var(--text);
+}
+
+a, a:visited {
+	color: var(--accent);
+	font-weight: 600;
+}
+a:hover {
+	color: var(--accent-hover);
+}
+
+/* Buttons */
+button,
+.button,
+a.button,
+input[type=submit],
+input[type=reset],
+input[type=button] {
+	background: var(--terracotta-gradient);
+	border: var(--border-width) solid var(--terracotta-dark);
+	color: var(--accent-text);
+	font-weight: 700;
+	padding: 0.6em 1.25em;
+	border-radius: var(--standard-border-radius);
+	box-shadow: 0 2px 6px rgb(143 74 48 / 0.2);
+}
+button:enabled:hover,
+.button:not([aria-disabled=true]):hover,
+input[type=submit]:enabled:hover,
+input[type=reset]:enabled:hover,
+input[type=button]:enabled:hover {
+	background: var(--terracotta-dark);
+	border-color: var(--terracotta-dark);
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+	outline: 3px solid color-mix(in srgb, var(--terracotta) 55%, transparent);
+	outline-offset: 2px;
+}
+
+/* Form fields */
+textarea,
+select,
+input {
+	background-color: #ffffff;
+	border: 2px solid var(--border);
+	border-radius: var(--standard-border-radius);
+	color: var(--text);
+}
+textarea:focus,
+select:focus,
+input:focus {
+	border-color: var(--terracotta);
+}
+label {
+	color: var(--text);
+}
+
+/* Footer */
+body > footer {
+	background-color: #ffffff;
+	border-top: var(--border-width) solid var(--border);
+	color: var(--text-light);
+}
+
 /* Navigation custom rules */
 
 nav{
 	grid-column: 1/-1;
-	background-color: #808080;
+	display: flex;
+	align-items: center;
+	background-color: #ffffff;
+	border-bottom: 1px solid var(--border);
+	box-shadow: 0 1px 4px rgb(43 31 23 / 0.06);
+	padding-inline: 1.5rem;
 }
+
+/* Site name, links to the home page */
+nav a.brand,
+nav a.brand:visited {
+	margin-right: auto;
+	padding: 0.75rem 0;
+	font-family: var(--serif-font);
+	font-size: 1.75rem;
+	font-weight: 700;
+	line-height: 1;
+	color: var(--terracotta);
+	text-decoration: none;
+}
+nav a.brand:hover {
+	color: var(--accent-hover);
+}
+
 ul {
 	display:flex;
 	justify-content: right;
@@ -42,35 +203,65 @@ ul li {
   	float: left;
 }
 
-ul li a {
-  	color: white;
+#nav-menu {
+	align-items: center;
+	gap: 0.25rem;
+	/* the outlined Login/Logout button's border must not be clipped */
+	overflow: visible;
+	padding-block: 0.5rem;
+}
+
+nav ul li a,
+nav ul li a:visited {
+  	color: var(--text-light);
+  	font-weight: 500;
   	text-align: center;
-  	padding: 20px 25px;
+  	padding: 0.75rem 1.1rem;
   	text-decoration: none;
   	display: block;
+  	border-radius: var(--standard-border-radius);
 }
 
-ul li a:hover {
-  	background-color: #111111;
+nav ul li a:hover {
+  	color: var(--accent);
+  	background-color: var(--blush);
 }
 
-#btn{
+/* Login link styled as the outlined "Log in" button */
+nav ul li a[href*="login"] {
+	color: var(--accent);
+	border: 2px solid var(--terracotta);
+	padding: 0.55rem 1.25rem;
+	margin-left: 0.5rem;
+	font-weight: 600;
+}
+
+.logout-form {
+	margin: 0 0 0 0.5rem;
+}
+
+nav #btn{
 	display: block;
-	width: 100%;
-	background: none;
-	border: none;
-	color: white;
+	width: auto;
+	white-space: nowrap;
+	background: #ffffff;
+	border: 2px solid var(--terracotta);
+	color: var(--accent);
 	text-align: center;
-	padding: 20px 25px;
+	padding: 0.55rem 1.25rem;
+	margin: 0;
 	text-decoration: none;
 	font: inherit;
+	font-weight: 600;
 	cursor: pointer;
-	margin-bottom: 0;
-	border-radius: initial;
+	border-radius: var(--standard-border-radius);
+	box-shadow: none;
 }
 
-#btn:hover {
-    background-color: #111111;
+nav #btn:hover {
+	background: var(--terracotta-gradient);
+	border-color: var(--terracotta-dark);
+	color: #ffffff;
 }
 
 nav button.hamburger-btn {
@@ -80,23 +271,68 @@ nav button.hamburger-btn {
 	gap: 5px;
 	background: none;
 	border: none;
-	border-radius: 0;
+	border-radius: var(--standard-border-radius);
+	box-shadow: none;
 	margin: 0;
-	padding: 20px 25px;
+	padding: 14px 16px;
 	cursor: pointer;
 }
 
-nav button.hamburger-btn:hover {
-	background-color: #111111;
+nav button.hamburger-btn:enabled:hover {
+	background: var(--blush);
 }
 .hamburger-btn .bar {
 	display: block;
 	width: 24px;
 	height: 3px;
-	background-color: white;
+	background-color: var(--accent);
 	border-radius: 2px;
 }
 
+/* Shared card-like elements from page-level styles */
+main .job-card:not(.job-container .job-card),
+main .panel {
+	background: #ffffff;
+	border: 1px solid var(--border);
+	border-radius: 16px;
+	box-shadow: 0 2px 10px rgb(143 74 48 / 0.06);
+}
+
+/* Danger buttons set only background-color; drop the theme gradient */
+.cancel-btn {
+	background-image: none;
+}
+main .row {
+	border-top-color: var(--border);
+}
+main .row:first-of-type {
+	border-top: none;
+}
+main .muted {
+	color: var(--text-light);
+	opacity: 1;
+}
+main .job-status {
+	background: var(--blush);
+	color: var(--terracotta-dark);
+	font-weight: 600;
+}
+main .job-open {
+	background: var(--blush);
+	color: var(--terracotta-dark);
+}
+main .job-pending {
+	background: #fbeccb;
+	color: #7a4f0e;
+}
+main .job-accepted {
+	background: #e3efe2;
+	color: #2f5d2c;
+}
+main .job-declined {
+	background: #f6dcd6;
+	color: #8e2f22;
+}
 
 /* Rule set for mobile nav */
 @media (max-width: 720px) {
@@ -104,6 +340,11 @@ nav button.hamburger-btn:hover {
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: flex-end;
+		padding-inline: 1rem;
+	}
+
+	nav a.brand {
+		font-size: 1.5rem;
 	}
 
 	nav button.hamburger-btn {
@@ -113,17 +354,33 @@ nav button.hamburger-btn:hover {
 	#nav-menu {
 		display: none;
 		flex-direction: column;
+		align-items: stretch;
 		width: 100%;
+		padding-bottom: 0.75rem;
 	}
 
 	#nav-menu.active {
 		display: flex;
 	}
 
-	#nav-menu li a,
-	#btn {
+	nav ul li a,
+	nav #btn {
 		text-align: left;
-		border-top: 1px solid #000000;
+		border-radius: 0;
+		border-top: 1px solid var(--border);
+		margin-left: 0;
 	}
 
+	.logout-form {
+		margin: 0;
+	}
+
+	nav ul li a[href*="login"],
+	nav #btn {
+		width: 100%;
+		text-align: center;
+		border: 2px solid var(--terracotta);
+		border-radius: var(--standard-border-radius);
+		margin-top: 0.75rem;
+	}
 }

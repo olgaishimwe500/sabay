@@ -24,8 +24,12 @@
 		</div>
 		<div class="options">
 			<button> Message </button>
-			<button> Details </button>
-			<button id="cancel-btn"> Cancel </button>
+			<a class="button" href="{% url 'booking:job_detail' job.pk %}">Details</a>
+			<form method="post" action="{% url 'members:cancel_job' job.pk %}"
+				onsubmit="return confirm('Cancel this job? It will be reopened so the seeker can find another provider.');">
+				{% csrf_token %}
+				<button type="submit" class="cancel-btn">Cancel</button>
+			</form>
 		</div>
 	</div>
 	{% empty %}

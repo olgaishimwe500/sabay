@@ -12,16 +12,19 @@
   </head>
   <body>
 	    <nav>
+		    <a class="brand" href="{% url 'home' %}">Sabay</a>
 		    <button class="hamburger-btn" type="button" aria-controls="nav-menu" aria-expanded="false" aria-label="Toggle menu">
 			    <span class="bar"></span>
 			    <span class="bar"></span>
 			    <span class="bar"></span>
 		    </button>
 		    <ul id="nav-menu" >
-			    <li><a href="{% url 'home' %}"> Home </a></li>
+			    <!--<li><a href="{% url 'home' %}"> Home </a></li> -->
 
 			    <li><a href="{% url 'dashboard' %}">Dashboard </a></li>
-
+			    {% if user.provider_profile %}
+			    	<li><a href="{% url 'booking:job_list' %}">Job board</a></li>
+			    {% endif %}
 			    <li><a href="{% url 'chat:index' %}">Chat </a></li>
 			    <!-- Checks to see if user is authenticated -->
 			    {% if user.is_authenticated %}
