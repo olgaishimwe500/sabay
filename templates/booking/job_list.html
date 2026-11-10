@@ -3,12 +3,7 @@
 {% block title %}Job board | Sabay{% endblock %}
 
 {% block extra_head %}
-<style>
-  .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
-  .job-card { border: 1px solid #555; border-radius: 10px; padding: 1rem; }
-  .job-status { font-size: 0.8rem; padding: 2px 8px; border-radius: 999px; background: #555; }
-  .job-open { background: #1d6fe0; color: #fff; }
-</style>
+    {% include "booking/job_style.html" %}
 {% endblock %}
 
 {% block content %}

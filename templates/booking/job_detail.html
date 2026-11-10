@@ -5,6 +5,22 @@
 {% block content %}
   <h1>{{ job.title|default:job.task_type }}</h1>
   <p>Status: {{ job.get_status_display }}</p>
+  
+  {% if job.provider %}
+    <p>Provider: {{ job.provider.user.username }}</p>
+  {% endif %}
+
+  {% if job.status == "pending" and request.user == job.seeker.user %}
+    <p>A provider wants to take this job.</p>
+    <form method="post" action="{% url 'booking:confirm' job.pk %}" style="display:inline">
+        {% csrf_token %}
+        <button type="submit">Confirm</button>
+    </form>
+    <form method="post" action="{% url 'booking:decline' job.pk %}" style="display:inline">
+        {% csrf_token %}
+        <button type="submit">Decline</button>
+    </form>
+  {% endif %}
   <p>Type: {{ job.task_type }}</p>
   <p>When: {{ job.schedule_start|date:"M j, Y g:i A" }} to {{ job.schedule_end|date:"g:i A" }}</p>
   <p>{{ job.description }}</p>
@@ -15,5 +31,9 @@
   {% endif %}
 
   <p>Posted by {{ job.seeker.user.username }}</p>
-  <p><a href="{% url 'booking:job_list' %}">Back to the board</a></p>
+  {% if user.provider_profile %}
+    <p><a href="{% url 'booking:job_list' %}">Back to the board</a></p>
+  {% else %}
+    <p><a href="{% url 'members:seeker_dashboard' %}">Back to my dashboard</a></p>
+  {% endif %}
 {% endblock %}

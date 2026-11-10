@@ -39,7 +39,7 @@ def login(request):
             auth_login(request, user)
             if hasattr(user, "provider_profile"):
                 return redirect("dashboard")
-            return redirect("home")
+            return redirect("members:seeker_dashboard")
 
     return render(request, "auth_logic/login.html", {"error": error})
 
