@@ -31,5 +31,9 @@
   {% endif %}
 
   <p>Posted by {{ job.seeker.user.username }}</p>
-  <p><a href="{% url 'booking:job_list' %}">Back to the board</a></p>
+  {% if user.provider_profile %}
+    <p><a href="{% url 'booking:job_list' %}">Back to the board</a></p>
+  {% else %}
+    <p><a href="{% url 'members:seeker_dashboard' %}">Back to my dashboard</a></p>
+  {% endif %}
 {% endblock %}

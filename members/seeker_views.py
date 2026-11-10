@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
+from booking.models import JobReq
+
 from .forms import SeekerProfileForm
 from .models import Seeker
-from booking.models import JobReq
 
 
 @login_required
@@ -26,19 +27,29 @@ def seeker_profile_edit(request):
         return redirect("members:seeker_profile")
     return render(request, "members/seeker_profile_edit.html", {"form": form})
 
+
 @login_required
 def seeker_dashboard(request):
     seeker, _ = Seeker.objects.get_or_create(user=request.user)
     jobs = seeker.job_posts.all()
 
-    pending_reqs=( JobReq.objects.filter(job__seeker=seeker, status="pending", job__status="open").select_related("job", "provider__user").order_by("job__schedule_start"))
-    open_jobs = (jobs.filter(status="open").exclude(applications__status="pending").order_by("schedule_start"))
-    upcoming_jobs=jobs.filter(status="accepted").order_by("schedule_start")[:3]
+    pending_reqs = (
+        JobReq.objects.filter(job__seeker=seeker, status="pending", job__status="open")
+        .select_related("job", "provider__user")
+        .order_by("job__schedule_start")
+    )
+    open_jobs = (
+        jobs.filter(status="open")
+        .exclude(applications__status="pending")
+        .order_by("schedule_start")
+    )
+    upcoming_jobs = jobs.filter(status="accepted").order_by("schedule_start")[:3]
 
-    context={"seeker": seeker,
-            "pending_reqs": pending_reqs,
-            "open_jobs": open_jobs,
-            "upcoming_jobs": upcoming_jobs,}
+    context = {
+        "seeker": seeker,
+        "pending_reqs": pending_reqs,
+        "open_jobs": open_jobs,
+        "upcoming_jobs": upcoming_jobs,
+    }
 
     return render(request, "members/seeker_dashboard.html", context)
-    
