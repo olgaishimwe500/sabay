@@ -32,7 +32,7 @@ def login(request):
                 return redirect("dashboard")
 
             elif hasattr(request.user, "seeker_profile"):
-                return redirect("home")
+                return redirect("members:seeker_dashboard")
         else:
             error = "Invalid username or password"
 
