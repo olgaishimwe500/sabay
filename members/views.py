@@ -2,10 +2,12 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.db.models import OuterRef, Q, Subquery
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from booking.models import JobPost, JobReq
@@ -80,7 +82,9 @@ Hopefully this can replace the availablity deal :)
 @login_required
 @require_POST
 def toggle_availability(request):
-    provider = request.user.provider_profile
+    provider = getattr(request.user, "provider_profile", None)
+    if provider is None:
+        return redirect("members:seeker_dashboard")
     provider.is_available = "is_available" in request.POST
     provider.save()
     return redirect("dashboard")
@@ -88,57 +92,58 @@ def toggle_availability(request):
 
 """
 This function will allow providers to see their booking request.
+Anyone who is not a provider is sent to the seeker dashboard.
 """
 
 
 @login_required
 def dashboard(request):
-    if hasattr(request.user, "provider_profile"):
-        provider = getattr(request.user, "provider_profile", None)
-        now = timezone.now()
-        # Hide jobs whose start time passed before anyone was accepted
-        JobPost.objects.expire_past_due(now)
-        booking_requests = (
-            JobPost.objects.select_related("seeker__user")
-            .filter(status="open", provider=provider)
-            .order_by("-created_at")[:5]
-        )
-        upcoming_jobs = (
-            JobPost.objects.select_related("seeker__user")
-            # Using Q from db.models allows for grouping filters
-            .filter(
-                Q(status="accepted", provider=provider, schedule_start__gte=now)
-                | Q(applications__provider=provider, applications__status="approved")
-            )
-            .order_by("schedule_start")
-        )
-        my_request_status = JobReq.objects.filter(
-            job=OuterRef("pk"), provider=provider
-        ).values("status")[:1]
+    provider = getattr(request.user, "provider_profile", None)
+    if provider is None:
+        return redirect("members:seeker_dashboard")
 
-        dismissed_jobs = JobReq.objects.filter(
-            provider=provider, dismissed=True
-        ).values("job_id")
-        open_jobs = (
-            JobPost.objects.select_related("seeker__user")
-            .filter(status="open", provider__isnull=True)
-            .exclude(applications__provider=provider, applications__status="approved")
-            .exclude(pk__in=dismissed_jobs)
-            .annotate(my_status=Subquery(my_request_status))
-            .order_by("-created_at")
+    now = timezone.now()
+    # Hide jobs whose start time passed before anyone was accepted
+    JobPost.objects.expire_past_due(now)
+    booking_requests = (
+        JobPost.objects.select_related("seeker__user")
+        .filter(status="open", provider=provider)
+        .order_by("-created_at")[:5]
+    )
+    upcoming_jobs = (
+        JobPost.objects.select_related("seeker__user")
+        # Using Q from db.models allows for grouping filters
+        .filter(
+            Q(status="accepted", provider=provider, schedule_start__gte=now)
+            | Q(applications__provider=provider, applications__status="approved")
         )
-        return render(
-            request,
-            "providers/dashboard.html",
-            {
-                "provider": provider,
-                "booking_requests": booking_requests,
-                "upcoming_jobs": upcoming_jobs[:3],
-                "open_jobs": open_jobs[:3],
-            },
-        )
-    elif hasattr(request.user, "seeker_profile"):
-        return redirect("home")
+        .order_by("schedule_start")
+    )
+    my_request_status = JobReq.objects.filter(
+        job=OuterRef("pk"), provider=provider
+    ).values("status")[:1]
+
+    dismissed_jobs = JobReq.objects.filter(
+        provider=provider, dismissed=True
+    ).values("job_id")
+    open_jobs = (
+        JobPost.objects.select_related("seeker__user")
+        .filter(status="open", provider__isnull=True)
+        .exclude(applications__provider=provider, applications__status="approved")
+        .exclude(pk__in=dismissed_jobs)
+        .annotate(my_status=Subquery(my_request_status))
+        .order_by("-created_at")
+    )
+    return render(
+        request,
+        "providers/dashboard.html",
+        {
+            "provider": provider,
+            "booking_requests": booking_requests,
+            "upcoming_jobs": upcoming_jobs[:3],
+            "open_jobs": open_jobs[:3],
+        },
+    )
 
 
 """
@@ -149,17 +154,52 @@ Handles if provider accepts a job or declines it
 @login_required
 @require_POST
 def job_response(request, job_id):
-    job = get_object_or_404(JobPost, pk=job_id)
+    provider = getattr(request.user, "provider_profile", None)
+    if provider is None:
+        return redirect("members:seeker_dashboard")
+    # Only the provider this booking request was sent to can answer it,
+    # and only while it is still open
+    job = get_object_or_404(JobPost, pk=job_id, provider=provider, status="open")
     action = request.POST.get("action")
-    print("POST data:", request.POST, "| action:", action)
     if action == "accept":
         job.status = "accepted"
+        job.save()
     elif action == "decline":
         job.status = "declined"
+        job.save()
+    return redirect("dashboard")
 
-    job.save()
-    job.refresh_from_db()
-    print("Saved status:", repr(job.status))
+
+"""
+Lets a provider back out of an upcoming job. The job is reopened so the
+seeker can find someone else, and this provider's request is marked as not
+selected and dismissed so the job doesn't come back on their pages.
+"""
+
+
+@login_required
+@require_POST
+def cancel_job(request, job_id):
+    provider = getattr(request.user, "provider_profile", None)
+    if provider is None:
+        return redirect("members:seeker_dashboard")
+    job = get_object_or_404(
+        JobPost,
+        pk=job_id,
+        provider=provider,
+        status="accepted",
+        schedule_start__gt=timezone.now(),
+    )
+    with transaction.atomic():
+        job.provider = None
+        job.status = "open"
+        job.save()
+        # Direct bookings have no request yet, so create one if needed
+        JobReq.objects.update_or_create(
+            job=job,
+            provider=provider,
+            defaults={"status": "declined", "dismissed": True},
+        )
     return redirect("dashboard")
 
 
@@ -183,6 +223,14 @@ def job_request(request, job_id):
         schedule_start__gt=timezone.now(),
     )
     JobReq.objects.get_or_create(job=job, provider=provider)
+    # Return to the page the request came from (e.g. the job board)
+    next_url = request.POST.get("next")
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return redirect(next_url)
     return redirect("dashboard")
 
 

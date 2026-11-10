@@ -7,8 +7,15 @@ from .forms import SeekerProfileForm
 from .models import Seeker
 
 
+def is_provider(user):
+    """Providers use the provider pages; they never get a seeker profile."""
+    return hasattr(user, "provider_profile")
+
+
 @login_required
 def seeker_profile(request):
+    if is_provider(request.user):
+        return redirect("dashboard")
     seeker, _ = Seeker.objects.get_or_create(user=request.user)
     jobs = seeker.job_posts.order_by("-created_at")
     return render(
@@ -18,6 +25,8 @@ def seeker_profile(request):
 
 @login_required
 def seeker_profile_edit(request):
+    if is_provider(request.user):
+        return redirect("dashboard")
     seeker, _ = Seeker.objects.get_or_create(user=request.user)
     form = SeekerProfileForm(
         request.POST or None, request.FILES or None, instance=seeker
@@ -30,6 +39,8 @@ def seeker_profile_edit(request):
 
 @login_required
 def seeker_dashboard(request):
+    if is_provider(request.user):
+        return redirect("dashboard")
     seeker, _ = Seeker.objects.get_or_create(user=request.user)
     jobs = seeker.job_posts.all()
 
