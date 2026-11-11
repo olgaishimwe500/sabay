@@ -163,6 +163,9 @@ input:checked + .slider:before {
 	gap: 0.75rem;
 	min-width: 0;
 }
+.profile-initials{
+	font-size: 45px;
+}
 .job-info p {
 	margin: 0;
 }

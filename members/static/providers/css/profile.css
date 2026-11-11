@@ -76,6 +76,9 @@
 	border: var(--border-width) solid var(--border);
 }
 
+.profile-initials{
+	font-size: 45px;
+}
 .names-container{
 	display: flex;
 	gap:10%;

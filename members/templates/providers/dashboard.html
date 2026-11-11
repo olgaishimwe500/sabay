@@ -11,7 +11,7 @@
 {% block content %}
 <div class="dashboard">
 	<div class="greeting" >
-		<h1> Good evening, {{ user.first_name }} </h1>
+		<h1><span id="greeting">Hello</span>, {{ user.first_name }}</h1>
 		{% if provider %}		
 		<div class="accept-container">
 			<p> Accepting Jobs </p>
@@ -67,3 +67,7 @@
 </div>
 </div>
 {% endblock %}
+{% block scripts %}
+<script src="{% static 'general/js/members.js' %}"></script>
+{% endblock %}
+

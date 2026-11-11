@@ -1,105 +1,135 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+
+{% load static %}
 
 {% block title %}Dashboard | Sabay{% endblock %}
 
 {% block extra_head %}
-  {% include "booking/job_style.html" %}
-  <style>
-    .dash { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; width:100%}
-    @media (max-width: 800px) { .dash { grid-template-columns: 1fr; } }
-    .panel { border: 1px solid #555; border-radius: 10px; padding: 1rem; margin-bottom: 1.5rem; }
-    .row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .6rem 0; border-top: 1px solid #444; }
-    .row:first-of-type { border-top: none; }
-    .muted { font-size: .85rem; opacity: .7; }
-    .top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; width: 100% }
-  </style>
+<link rel="stylesheet" href="{% static 'providers/css/dashboard.css' %}">
 {% endblock %}
 
 {% block content %}
-  <div class="top">
-    <h3><span id="greeting">Hello</span>, {{ seeker.user.get_full_name|default:seeker.user.username }}</h3>
-    <p>
-      
-      <a href="{% url 'booking:post_job' %}"><button type="button">Post a job</button></a>
-    </p>
-  </div>
+<div class="dashboard">
+	<div class="greeting">
+		<h1><span id="greeting">Hello</span>, {{ seeker.user.first_name|default:seeker.user.username }}</h1>
+		<div class="post-job-container">
+			<p>
+				<a class="button" href="{% url 'booking:post_job' %}">Post a job</a>
+			</p>
+		</div>
+	</div>
+	<div class="dash-main-container">
+		<div class="job-section-container">
+			<div class="job-container">
+				<div class="job-header">
+					<h2>My job posts</h2>
+					<a href="{% url 'members:seeker_profile' %}">Manage posts</a>
+				</div>
+				<div class="job-cards">
+					{% for req in pending_reqs %}
+					<div class="job-card">
+						<div class="ls-card">
+							<div class="img-container">
+								{% if req.provider.profilePicture %}
+									<img src="{{ req.provider.profilePicture.url }}" alt="provider profile picture">
+								{% else %}
+								<span class="profile-initials" aria-hidden="true">{{ provider.user.first_name|first|upper }}{{ provider.user.last_name|first|upper }}</span>
+								{% endif %}
+							</div>
+							<div class="job-info">
+								<span>{{ req.job.task_type }}</span>
+								<p>{{ req.job.schedule_start|date:"D, M j" }} &middot; {{ req.job.schedule_start|time:"g:i A" }}</p>
+								<p>{{ req.provider.user.get_full_name|default:req.provider.user.username }} wants this job</p>
+							</div>
+						</div>
+						<div class="options">
+							<span class="job-req-status pending">Waiting on you</span>
+							<form method="post" action="{% url 'booking:decline' req.pk %}">
+								{% csrf_token %}
+								<button type="submit" class="cancel-btn">Decline</button>
+							</form>
+							<form method="post" action="{% url 'booking:confirm' req.pk %}">
+								{% csrf_token %}
+								<button type="submit">Accept</button>
+							</form>
+						</div>
+					</div>
+					{% endfor %}
+					{% for job in open_jobs %}
+					<div class="job-card">
+						<div class="ls-card">
+							<div class="job-info">
+								<span>{{ job.task_type }}</span>
+								<p>{{ job.schedule_start|date:"D, M j" }} &middot; {{ job.schedule_start|time:"g:i A" }}</p>
+								<p>No requests yet</p>
+							</div>
+						</div>
+						<div class="options">
+							<span class="job-req-status declined">Open</span>
+							<a class="button" href="{% url 'booking:job_detail' job.pk %}">Details</a>
+						</div>
+					</div>
+					{% endfor %}
+					{% if not pending_reqs and not open_jobs %}
+					<p>Nothing waiting. <a href="{% url 'booking:post_job' %}">Post a job</a>.</p>
+					{% endif %}
+				</div>
+			</div>
 
-  <div class="dash">
-    <div>
-      <section class="panel">
-        <h2>My job posts</h2>
-        {% for req in pending_reqs %}
-          <div class="row">
-            <div>
-              <strong>{{ req.job.task_type }}</strong>
-              <div class="muted">{{ req.job.schedule_start|date:"D, M j, g:i A" }} &middot; {{ req.provider.user.username }} wants this job</div>
-            </div>
-            <div>
-              <span class="job-status job-pending">Waiting on you</span>
-              <form method="post" action="{% url 'booking:decline' req.pk %}" style="display:inline">
-                {% csrf_token %}<button type="submit">Decline</button>
-              </form>
-              <form method="post" action="{% url 'booking:confirm' req.pk %}" style="display:inline">
-                {% csrf_token %}<button type="submit">Accept</button>
-              </form>
-            </div>
-          </div>
-        {% endfor %}
-        {% for job in open_jobs %}
-          <div class="row">
-            <div>
-              <strong>{{ job.task_type }}</strong>
-              <div class="muted">{{ job.schedule_start|date:"D, M j, g:i A" }} &middot; no requests yet</div>
-            </div>
-            <div>
-              <span class="job-status job-open">Open</span>
-              <a href="{% url 'booking:job_detail' job.pk %}"><button type="button">Details</button></a>
-            </div>
-          </div>
-        {% endfor %}
-        {% if not pending_reqs and not open_jobs %}
-          <p>Nothing waiting. <a href="{% url 'booking:post_job' %}">Post a job</a>.</p>
-        {% endif %}
-        <p><a href="{% url 'members:seeker_profile' %}">Manage posts</a></p>
-      </section>
+			<div class="job-container">
+				<div class="job-header">
+					<h2>Upcoming visits</h2>
+				</div>
+				<div class="job-cards">
+					{% for job in upcoming_jobs %}
+					<div class="job-card">
+						<div class="ls-card">
+							<div class="job-info">
+								<span>{{ job.task_type }}</span>
+								<p>{{ job.schedule_start|date:"D, M j" }} &middot; {{ job.schedule_start|time:"g:i A" }} to {{ job.schedule_end|time:"g:i A" }}</p>
+							</div>
+						</div>
+						<div class="options">
+							<a class="button" href="{% url 'booking:job_detail' job.pk %}">Details</a>
+						</div>
+					</div>
+					{% empty %}
+					<p>No upcoming visits yet.</p>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
 
-      <section class="panel">
-        <h2>Upcoming visits</h2>
-        {% for job in upcoming_jobs %}
-          <div class="row">
-            <div>
-              <strong>{{ job.task_type }}</strong>
-              <div class="muted">{{ job.schedule_start|date:"D, M j, g:i A" }} to {{ job.schedule_end|date:"g:i A" }}</div>
-            </div>
-            <a href="{% url 'booking:job_detail' job.pk %}"><button type="button">Details</button></a>
-          </div>
-        {% empty %}
-          <p>No upcoming visits yet.</p>
-        {% endfor %}
-      </section>
-    </div>
+		<div class="side-info-container">
+			<div class="profile-container">
+				<div class="profile-info">
+					<div class="profile-card-img-container">
+						{% if seeker.photo %}
+						<img src="{{ seeker.photo.url }}" alt="Profile photo">
+						{% else %}
+						<span class="profile-initials" aria-hidden="true">{{ seeker.user.first_name|first|upper }}{{ seeker.user.last_name|first|upper }}</span>
+						{% endif %}
+					</div>
+					<div class="profile-card-info">
+						<span>{{ seeker.user.get_full_name|default:seeker.user.username }}</span>
+						<p>{{ seeker.location|default:"Location not set" }}</p>
+					</div>
+				</div>
+				<a href="{% url 'members:seeker_profile' %}"><button type="button" class="edit-profile">Edit profile</button></a>
+			</div>
 
-    <div>
-      <section class="panel">
-        {% if seeker.photo %}<img src="{{ seeker.photo.url }}" alt="Profile photo" width="80">{% endif %}
-        <h3>{{ seeker.user.get_full_name|default:seeker.user.username }}</h3>
-        <p class="muted">{{ seeker.location|default:"Location not set" }}</p>
-        <a href="{% url 'members:seeker_profile' %}"><button type="button">Edit profile</button></a>
-      </section>
-
-      <section class="panel">
-        <h3>Messages</h3>
-        <p class="muted">Your conversations with providers.</p>
-        <a href="{% url 'chat:index' %}">Inbox</a>
-      </section>
-    </div>
-  </div>
+			<div class="profile-container">
+				<div class="profile-section">
+					<h3>Messages</h3>
+					<p class="profile-empty">Your conversations with providers.</p>
+				</div>
+				<a href="{% url 'chat:index' %}"><button type="button" class="edit-profile">Inbox</button></a>
+			</div>
+		</div>
+	</div>
+</div>
 {% endblock %}
 
 {% block scripts %}
-<script>
-  const h = new Date().getHours();
-  document.getElementById("greeting").textContent =
-    h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
-</script>
+<script src="{% static 'general/js/members.js' %}"></script>
 {% endblock %}
