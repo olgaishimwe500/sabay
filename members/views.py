@@ -203,6 +203,25 @@ def cancel_job(request, job_id):
     return redirect("dashboard")
 
 
+@login_required
+@require_POST
+def complete_job(request, job_id):
+    provider = getattr(request.user, "provider_profile", None)
+    if provider is None:
+        return redirect("members:seeker_dashboard")
+    job = get_object_or_404(JobPost, pk=job_id, provider=provider, status="accepted")
+    job.status = "completed"
+    job.save(update_fields=["status"])
+    next_url = request.POST.get("next")
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return redirect(next_url)
+    return redirect("dashboard")
+
+
 """
 Handles the logic when a provider requests a 
 job.

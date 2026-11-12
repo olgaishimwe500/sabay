@@ -69,7 +69,7 @@
         </div>
         <div>
           <dt>Address</dt>
-          <dd>Shared after confirmation</dd>
+          <dd>{% if job.status == "accepted" %}{{ job.address }}{% else %}Shared after confirmation{% endif %}</dd>
         </div>
       </dl>
 
@@ -100,7 +100,14 @@
         {% else %}
           <span class="board-action-status">No longer taking requests</span>
         {% endif %}
-        <a class="board-secondary" href="{% url 'booking:job_detail' job.pk %}">View full details</a>
+        {% if job.status == "accepted" %}
+          <form method="post" action="{% url 'members:complete_job' job.pk %}"
+                onsubmit="return confirm('Mark this job as complete?');">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <button type="submit">Complete</button>
+          </form>
+        {% endif %}
       </div>
     </section>
     {% endwith %}

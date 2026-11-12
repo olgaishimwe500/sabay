@@ -25,6 +25,11 @@
 		<div class="options">
 			<button> Message </button>
 			<a class="button" href="{% url 'booking:job_detail' job.pk %}">Details</a>
+			<form method="post" action="{% url 'members:complete_job' job.pk %}"
+				onsubmit="return confirm('Mark this job as complete?');">
+				{% csrf_token %}
+				<button type="submit">Complete</button>
+			</form>
 			<form method="post" action="{% url 'members:cancel_job' job.pk %}"
 				onsubmit="return confirm('Cancel this job? It will be reopened so the seeker can find another provider.');">
 				{% csrf_token %}

@@ -51,6 +51,7 @@ urlpatterns = [
     path("job-response/<int:job_id>/", views.job_response, name="job_response"),
     path("jobs/<int:job_id>/request/", views.job_request, name="job_request"),
     path("jobs/<int:job_id>/cancel/", views.cancel_job, name="cancel_job"),
+    path("jobs/<int:job_id>/complete/", views.complete_job, name="complete_job"),
     path(
         "jobs/<int:job_id>/dismiss_request/",
         views.dismiss_request,

@@ -17,7 +17,7 @@
 					<span>{{ job.seeker.user.get_full_name }}</span>
 					<p>{{ job.task_type }} &middot; {{ duration }} </p>
 					<!-- https://docs.djangoproject.com/en/6.1/ref/templates/builtins/#date -->
-					<p>{{ job.schedule_start|date:"D, M j" }} &middot; {{ job.schedule_start|time:"g:i A" }} &middot; {{job.address }} </p> 
+					<p>{{ job.schedule_start|date:"D, M j" }} &middot; {{ job.schedule_start|time:"g:i A" }} &middot; Address shared after confirmation</p> 
 					{% endwith %}
 			</div>
 		</div>
