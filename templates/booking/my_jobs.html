@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My jobs | Sabay{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/job_board.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="job-board">
+  <header class="board-header">
+    <div>
+      <h1>My jobs</h1>
+      <p class="board-subtitle">Every job you've posted, and where it stands.</p>
+    </div>
+    <a class="board-secondary" href="{% url 'booking:post_job' %}">Post a job</a>
+  </header>
+
+  <p class="board-count">{{ jobs|length }} job{{ jobs|length|pluralize }}</p>
+    <div class="board-layout">
+    <ul class="board-list" id="job-list">
+      {% for job in jobs %}
+        <li>
+          <a class="board-card{% if selected and job.pk == selected.pk %} is-selected{% endif %}" href="?job={{ job.pk }}#job-detail">
+            <span class="board-card-title">{{ job.task_type }}</span>
+            <span class="board-card-meta">{{ job.schedule_start|date:"D, M j" }} &middot; {{ job.schedule_start|time:"g:i A" }} &ndash; {{ job.schedule_end|time:"g:i A" }}</span>
+            <span class="board-tags">
+              <span class="board-tag status-{{ job.status }}">{{ job.get_status_display }}</span>
+              {% if job.pending_count %}<span class="board-tag status-requested">{{ job.pending_count }} waiting on you</span>{% endif %}
+            </span>
+            <span class="board-card-posted">Posted {{ job.created_at|timesince }} ago</span>
+          </a>
+        </li>
+      {% empty %}
+        <li class="board-empty">You haven't posted a job yet. <a href="{% url 'booking:post_job' %}">Post one</a>.</li>
+      {% endfor %}
+    </ul>
+    {% if selected %}
+      <section class="board-detail" id="job-detail">
+        <a class="board-back" href="#job-list">&larr; Back to my jobs</a>
+        <p class="board-eyebrow">{{ selected.get_status_display }}</p>
+        <h2>{{ selected.task_type }}</h2>
+        <p class="board-detail-posted">Posted {{ selected.created_at|timesince }} ago</p>
+
+        <dl class="board-facts">
+          <div><dt>When</dt><dd>{{ selected.schedule_start|date:"D, M j" }} &middot; {{ selected.schedule_start|time:"g:i A" }} &ndash; {{ selected.schedule_end|time:"g:i A" }}</dd></div>
+          <div><dt>Length</dt><dd>{{ selected.schedule_end|timeuntil:selected.schedule_start }}</dd></div>
+          <div><dt>Address</dt><dd>{{ selected.address }}</dd></div>
+        </dl>
+
+        <h3>About the job</h3>
+        <div class="board-description">{{ selected.description|linebreaks }}</div>
+        
+        {% if selected.provider %}
+          <div class="board-seeker">
+            <span class="board-avatar">{{ selected.provider.user.username|slice:":1"|upper }}</span>
+            <div><strong>{{ selected.provider.user.username }}</strong><span>Your provider</span></div>
+          </div>
+        {% endif %}
+
+        {% for req in pending_requests %}
+          <div class="board-seeker">
+            <span class="board-avatar">{{ req.provider.user.username|slice:":1"|upper }}</span>
+            <div><strong>{{ req.provider.user.username }}</strong><span>Wants this job</span></div>
+          </div>
+          <div class="board-actions">
+            <form method="post" action="{% url 'booking:decline' req.pk %}">
+              {% csrf_token %}<button type="submit">Decline</button>
+            </form>
+            <form method="post" action="{% url 'booking:confirm' req.pk %}">
+              {% csrf_token %}<button type="submit">Accept</button>
+            </form>
+          </div>
+        {% endfor %}
+      </section>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

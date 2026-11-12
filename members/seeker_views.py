@@ -33,7 +33,7 @@ def seeker_profile_edit(request):
     )
     if request.method == "POST" and form.is_valid():
         form.save()
-        return redirect("members:seeker_profile")
+        return redirect("members:seeker_dashboard")
     return render(request, "members/seeker_profile_edit.html", {"form": form})
 
 

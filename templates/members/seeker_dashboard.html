@@ -23,7 +23,7 @@
 			<div class="job-container">
 				<div class="job-header">
 					<h2>My job posts</h2>
-					<a href="{% url 'members:seeker_profile' %}">Manage posts</a>
+					<a href="{% url 'booking:my_jobs' %}">Manage posts</a>
 				</div>
 				<div class="job-cards">
 					{% for req in pending_reqs %}
@@ -115,7 +115,7 @@
 						<p>{{ seeker.location|default:"Location not set" }}</p>
 					</div>
 				</div>
-				<a href="{% url 'members:seeker_profile' %}"><button type="button" class="edit-profile">Edit profile</button></a>
+				<a href="{% url 'members:seeker_profile_edit' %}"><button type="button" class="edit-profile">Edit profile</button></a>
 			</div>
 
 			<div class="profile-container">
