@@ -67,6 +67,7 @@ body {
 	color: var(--text);
 }
 main {
+	padding-top: 6rem;
 	padding-inline: 1.5rem;
 	display: flex;
 	flex-direction: column;
@@ -165,6 +166,10 @@ body > footer {
 /* Navigation custom rules */
 
 nav{
+	position: fixed;
+	top: 0px;
+	z-index: 1000;
+	width: 100%;
 	grid-column: 1/-1;
 	display: flex;
 	align-items: center;
