@@ -78,7 +78,7 @@ def confirm(request, pk):
         job__status="open",
     )
     req.approve()
-    return redirect("members:my_jobs")
+    return redirect("booking:my_jobs")
 
 
 @login_required
@@ -93,7 +93,7 @@ def decline(request, pk):
     )
     req.status = "declined"
     req.save()
-    return redirect("members:seeker_dashboard")
+    return redirect("booking:my_jobs")
 
 
 @login_required
