@@ -9,4 +9,5 @@ urlpatterns = [
     path("<int:pk>/", views.job_detail, name="job_detail"),
     path("<int:pk>/confirm/", views.confirm, name="confirm"),
     path("<int:pk>/decline/", views.decline, name="decline"),
+    path("mine/", views.my_jobs, name="my_jobs"),
 ]

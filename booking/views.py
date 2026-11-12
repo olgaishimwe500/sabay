@@ -3,6 +3,7 @@ from django.db.models import OuterRef, Subquery
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
+from django.db.models import Count, OuterRef, Q, Subquery
 
 from members.models import Seeker
 
@@ -77,7 +78,7 @@ def confirm(request, pk):
         job__status="open",
     )
     req.approve()
-    return redirect("members:seeker_dashboard")
+    return redirect("members:my_jobs")
 
 
 @login_required
@@ -93,3 +94,40 @@ def decline(request, pk):
     req.status = "declined"
     req.save()
     return redirect("members:seeker_dashboard")
+
+
+@login_required
+def my_jobs(request):
+    seeker = getattr(request.user, "seeker_profile", None)
+    if seeker is None:
+        return redirect("dashboard")
+    now = timezone.now()
+    JobPost.objects.expire_past_due(now)
+    jobs = list(
+        JobPost.objects.filter(seeker=seeker)
+        .select_related("provider__user")
+        .annotate(
+            pending_count=Count(
+                "applications", filter=Q(applications__status="pending")
+            )
+        )
+        .order_by("-created_at")
+    )
+    selected_id = request.GET.get("job")
+    selected = next((j for j in jobs if str(j.pk) == selected_id), None)
+    current = selected or (jobs[0] if jobs else None)
+    pending_requests = (
+        current.applications.filter(status="pending").select_related("provider__user")
+        if current
+        else []
+    )
+    return render(
+        request,
+        "booking/my_jobs.html",
+        {
+            "jobs": jobs,
+            "selected": current,
+            "has_selection": selected is not None,
+            "pending_requests": pending_requests,
+        },
+    )
