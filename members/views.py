@@ -3,7 +3,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.db.models import OuterRef, Q, Subquery
+from django.db.models import OuterRef, Subquery
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -110,13 +110,13 @@ def dashboard(request):
         .filter(status="open", provider=provider)
         .order_by("-created_at")[:5]
     )
+    # Approving a request sets job.provider and status="accepted", so this
+    # covers both direct bookings and approved requests. Filtering through
+    # applications__ here would join every request on the job and list the
+    # job once per request.
     upcoming_jobs = (
         JobPost.objects.select_related("seeker__user")
-        # Using Q from db.models allows for grouping filters
-        .filter(
-            Q(status="accepted", provider=provider, schedule_start__gte=now)
-            | Q(applications__provider=provider, applications__status="approved")
-        )
+        .filter(status="accepted", provider=provider, schedule_start__gte=now)
         .order_by("schedule_start")
     )
     my_request_status = JobReq.objects.filter(

@@ -154,6 +154,17 @@ class JobRequestButtonTest(TestCase):
             JobReq.objects.filter(job=self.job, provider=self.provider).count(), 1
         )
 
+    def test_approved_job_listed_once_in_upcoming(self):
+        toby = User.objects.create_user(username="toby", password="password")
+        other = Provider.objects.create(user=toby)
+        JobReq.objects.create(job=self.job, provider=other)
+        JobReq.objects.create(job=self.job, provider=self.provider).approve()
+
+        self.client.login(username="john", password="password")
+        response = self.client.get(reverse("dashboard"))
+
+        self.assertEqual(list(response.context["upcoming_jobs"]), [self.job])
+
 
 class LoginViewTests(TestCase):
     def setUp(self):

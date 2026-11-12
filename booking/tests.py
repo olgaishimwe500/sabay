@@ -99,6 +99,27 @@ class JobBoardTests(TestCase):
         response = self.client.get(self.url)
         self.assertNotIn(stale, response.context["jobs"])
 
+    def test_jobs_accepted_by_other_providers_are_hidden(self):
+        other_user = User.objects.create_user(username="john", password="password")
+        other = Provider.objects.create(user=other_user)
+        JobReq.objects.create(job=self.older, provider=other).approve()
+        response = self.client.get(self.url)
+        self.assertNotIn(self.older, response.context["jobs"])
+        self.assertIn(self.newer, response.context["jobs"])
+
+    def test_jobs_accepted_by_this_provider_are_shown(self):
+        JobReq.objects.create(job=self.older, provider=self.provider).approve()
+        response = self.client.get(self.url, {"job": self.older.pk})
+        self.assertIn(self.older, response.context["jobs"])
+        self.assertContains(response, "You're booked for this job")
+
+    def test_other_statuses_are_hidden(self):
+        for status in ("declined", "completed", "cancelled", "not_selected"):
+            self.older.status = status
+            self.older.save()
+            response = self.client.get(self.url)
+            self.assertNotIn(self.older, response.context["jobs"], status)
+
     def test_board_has_no_post_a_job_link(self):
         response = self.client.get(self.url)
         self.assertNotContains(response, reverse("booking:post_job"))

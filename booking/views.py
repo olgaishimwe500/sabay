@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import OuterRef, Subquery
+from django.db.models import OuterRef, Q, Subquery
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -29,18 +29,24 @@ def post_job(request):
 @login_required
 def job_list(request):
     provider = getattr(request.user, "provider_profile", None)
-    if provider is None:
-        return redirect("members:seeker_dashboard")
+    '''if provider is None:
+        return redirect("members:seeker_dashboard")'''
     now = timezone.now()
     JobPost.objects.expire_past_due(now)
     # This provider's request status for each job (None if not requested)
     my_request_status = JobReq.objects.filter(
         job=OuterRef("pk"), provider=provider
     ).values("status")[:1]
-    # Expired jobs and jobs this provider was not selected for are hidden
+    # Show open jobs nobody has taken yet (including ones this provider has
+    # requested) plus jobs accepted by this provider. Jobs accepted by other
+    # providers, expired jobs, and jobs this provider was not selected for
+    # are hidden.
     jobs = list(
         JobPost.objects.select_related("seeker__user")
-        .exclude(status="expired")
+        .filter(
+            Q(status="open", provider__isnull=True)
+            | Q(status="accepted", provider=provider)
+        )
         .exclude(applications__provider=provider, applications__status="declined")
         .annotate(my_status=Subquery(my_request_status))
         .order_by("-created_at")

@@ -12,7 +12,6 @@
   <header class="board-header">
     <div>
       <h1>Job board</h1>
-      <p class="board-subtitle">Open requests from care seekers. Request a job you can take, or view the full details first.</p>
     </div>
   </header>
 
@@ -86,7 +85,9 @@
       </div>
 
       <div class="board-actions">
-        {% if job.my_status == "pending" %}
+        {% if job.status == "accepted" %}
+          <span class="board-action-status">You're booked for this job</span>
+        {% elif job.my_status == "pending" %}
           <span class="board-action-status">Requested &middot; waiting on seeker</span>
         {% elif job.my_status == "declined" %}
           <span class="board-action-status">Not selected for this job</span>
