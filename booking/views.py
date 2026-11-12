@@ -29,8 +29,8 @@ def post_job(request):
 @login_required
 def job_list(request):
     provider = getattr(request.user, "provider_profile", None)
-    """if provider is None:
-        return redirect("members:seeker_dashboard")"""
+    if provider is None:
+        return redirect("members:seeker_dashboard")
     now = timezone.now()
     JobPost.objects.expire_past_due(now)
     # This provider's request status for each job (None if not requested)
