@@ -265,4 +265,4 @@ class LoginViewTests(TestCase):
         response = self.client.post(
             self.url, {"username": "sue", "password": "password"}
         )
-        self.assertRedirects(response, reverse("home"), fetch_redirect_response=False)
+        self.assertRedirects(response, reverse("members:seeker_dashboard"), fetch_redirect_response=False)
