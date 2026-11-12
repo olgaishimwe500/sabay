@@ -123,9 +123,9 @@ def dashboard(request):
         job=OuterRef("pk"), provider=provider
     ).values("status")[:1]
 
-    dismissed_jobs = JobReq.objects.filter(
-        provider=provider, dismissed=True
-    ).values("job_id")
+    dismissed_jobs = JobReq.objects.filter(provider=provider, dismissed=True).values(
+        "job_id"
+    )
     open_jobs = (
         JobPost.objects.select_related("seeker__user")
         .filter(status="open", provider__isnull=True)

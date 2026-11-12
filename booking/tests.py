@@ -84,7 +84,9 @@ class JobBoardTests(TestCase):
             reverse("members:job_request", args=[self.older.pk]),
             {"next": "https://evil.example.com/"},
         )
-        self.assertRedirects(response, reverse("dashboard"), fetch_redirect_response=False)
+        self.assertRedirects(
+            response, reverse("dashboard"), fetch_redirect_response=False
+        )
 
     def test_expired_jobs_are_hidden(self):
         self.older.status = "expired"
