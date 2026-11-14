@@ -1,4 +1,5 @@
 from django import forms
+from members.models import Provider
 
 from .models import JobPost
 
@@ -20,7 +21,12 @@ DT_FORMAT = "%Y-%m-%dT%H:%M"
 ##actual forms that will take in all the info from seeker
 class JobPostForm(forms.ModelForm):
     task_type = forms.ChoiceField(choices=TASK_CHOICES, label="type of help")
-
+    provider = forms.ModelChoiceField(
+        queryset=Provider.objects.filter(is_available=True).select_related("user"),
+        required=False,
+        empty_label="Any provider",
+        label="Request a specific provider (optional)",
+        )
     class Meta:
         model = JobPost
         fields = [
@@ -29,6 +35,7 @@ class JobPostForm(forms.ModelForm):
             "schedule_start",
             "schedule_end",
             "address",
+            "provider",
         ]
         labels = {
             "schedule_start": "start",
