@@ -4,6 +4,7 @@
     <h1>Post a job </h1>
     <form method="post">
         {% csrf_token %}
+        {{ form.errors }}
         {{ form.as_p }}
         <button type="submit">Post</button>
         <a href="{% url 'members:seeker_profile' %}">Cancel</a>
