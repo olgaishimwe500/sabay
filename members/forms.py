@@ -1,5 +1,6 @@
 from django import forms
 from django.core.validators import FileExtensionValidator
+from datetime import date
 
 from .models import Provider, ProviderCert, Seeker
 
@@ -10,6 +11,20 @@ class SeekerProfileForm(forms.ModelForm):
         fields = ["photo", "date_of_birth", "location"]
         widgets = {"date_of_birth": forms.DateInput(attrs={"type": "date"})}
         labels = {"location": "Address"}
+
+    def clean_date_of_birth(self):
+        dob = self.cleaned_data.get("date_of_birth")
+        if dob is None:
+            return dob
+        today = date.today()
+        age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+        if dob > today:
+            raise forms.ValidationError("Date of birth can not be in the future")
+        if age < 18:
+            raise forms.ValidationError("You must be at least 18 to create an account")
+        if age > 110:
+            raise forms.ValidationError("please enter a valid date of birth")
+        return dob
 
 
 class ProviderPictureForm(forms.ModelForm):
@@ -91,3 +106,4 @@ class ProviderCertForm(forms.ModelForm):
         ):
             raise forms.ValidationError("You have already added this certificate.")
         return cert
+
