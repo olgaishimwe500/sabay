@@ -38,13 +38,16 @@ def job_list(request):
         job=OuterRef("pk"), provider=provider
     ).values("status")[:1]
     # Show open jobs nobody has taken yet (including ones this provider has
-    # requested) plus jobs accepted by this provider. Jobs accepted by other
+    # requested), booking requests sent directly to this provider, plus jobs
+    # accepted by this provider. Jobs accepted by other
     # providers, expired jobs, and jobs this provider was not selected for
     # are hidden.
     jobs = list(
         JobPost.objects.select_related("seeker__user")
         .filter(
             Q(status="open", provider__isnull=True)
+            # Direct booking requests a seeker sent to this provider
+            | Q(status="open", provider=provider)
             | Q(status="accepted", provider=provider)
         )
         .exclude(applications__provider=provider, applications__status="declined")

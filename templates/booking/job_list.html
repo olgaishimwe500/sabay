@@ -87,6 +87,13 @@
       <div class="board-actions">
         {% if job.status == "accepted" %}
           <span class="board-action-status">You're booked for this job</span>
+        {% elif job.status == "open" and job.provider_id %}
+          {# Only this provider's direct booking requests reach the board #}
+          <form method="post" action="{% url 'members:job_response' job.pk %}">
+            {% csrf_token %}
+            <button type="submit" name="action" value="accept">Accept</button>
+            <button type="submit" name="action" value="decline">Decline</button>
+          </form>
         {% elif job.my_status == "pending" %}
           <span class="board-action-status">Requested &middot; waiting on seeker</span>
         {% elif job.my_status == "declined" %}

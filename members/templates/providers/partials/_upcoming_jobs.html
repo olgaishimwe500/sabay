@@ -23,8 +23,7 @@
 			</div>
 		</div>
 		<div class="options">
-			<button> Message </button>
-			<a class="button" href="{% url 'booking:job_list'%}?jon={{ job.pk }}#job_detail">Details</a>
+			<a class="button" href="{% url 'booking:job_list' %}?job={{ job.pk }}#job-detail">Details</a>
 			<form method="post" action="{% url 'members:complete_job' job.pk %}"
 				onsubmit="return confirm('Mark this job as complete?');">
 				{% csrf_token %}

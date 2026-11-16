@@ -20,12 +20,13 @@
 			</div>
 		</div>
 		<div class="options">
+
+			<a class="button" href="{% url 'booking:job_list' %}?job={{ job.pk }}#job-detail">Details</a>
 			<form method="post" action="{% url 'members:job_response' job.id %}">
 				{% csrf_token %}
 				<button type="submit" name="action" value="accept"> Accept </button>
 				<button type="submit" name="action" value="decline"> Decline </button>
 			</form>
-			<button> Message </button>
 		</div>
 	</div>
 	{% empty %}

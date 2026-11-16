@@ -22,6 +22,8 @@
 			</div>
 		</div>
 		<div class="options">
+
+			<a class="button" href="{% url 'booking:job_list' %}?job={{ job.pk }}#job-detail">Details</a>
 			{% if job.my_status == "pending" %}
 				<span class="job-req-status pending">Requested &middot; waiting on seeker</span>
 			{% elif job.my_status == "declined" %}
