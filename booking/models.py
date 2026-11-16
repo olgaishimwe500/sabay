@@ -1,8 +1,9 @@
 from django.db import models, transaction
 from django.utils import timezone
+from django.core.validators import RegexValidator
 
 from members.models import Provider, Seeker
-
+from members.states import STATES
 # Create your models here.
 ##model for job postings. different from location.seeker or location.employee'
 
@@ -20,6 +21,10 @@ class JobPostQuerySet(models.QuerySet):
 
 
 class JobPost(models.Model):
+    zip_validator = RegexValidator(
+    regex=r'^\d{5}(?:-\d{4})?$',
+    message="Enter a valid US ZIP code (e.g., 12345 or 12345-6789).")
+
     seeker = models.ForeignKey(
         Seeker, on_delete=models.CASCADE, related_name="job_posts"
     )
@@ -30,9 +35,15 @@ class JobPost(models.Model):
         on_delete=models.SET_NULL,
         related_name="accepted_jobs",
     )
+
+    city = models.CharField(max_length=50, blank=True, verbose_name="City")
+    state = models.CharField(
+        max_length=2, choices=STATES, blank=True, verbose_name="State"
+    )
     task_type = models.CharField(max_length=200)
     description = models.TextField()
     address = models.CharField(max_length=255)
+    zip_code = models.CharField(max_length=5, validators=[zip_validator])
     schedule_start = models.DateTimeField()
     schedule_end = models.DateTimeField()
     status = models.CharField(

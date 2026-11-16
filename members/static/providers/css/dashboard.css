@@ -373,7 +373,6 @@ input:checked + .slider:before {
 /* Wide screens: one row per job, details left and actions right */
 @media (min-width: 951px){
 	.options{
-		margin-left: auto;
 		justify-content: flex-end;
 	}
 }

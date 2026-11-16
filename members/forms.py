@@ -2,7 +2,9 @@ from django import forms
 from django.core.validators import FileExtensionValidator
 from datetime import date
 
+from .cities import CITIES
 from .models import Provider, ProviderCert, Seeker
+from .states import STATES
 
 
 class SeekerProfileForm(forms.ModelForm):
@@ -49,11 +51,21 @@ class ProviderProfileForm(forms.ModelForm):
     so each widget points back to the form with the HTML form attribute.
     """
 
+    city = forms.ChoiceField(
+        choices=[("", "Select a city")] + [(c, c) for c in CITIES],
+        required=False,
+        widget=forms.Select(attrs={"form": "provider-profile-form"}),
+    )
+    state = forms.ChoiceField(
+        choices=[("", "Select a state")] + STATES,
+        required=False,
+        widget=forms.Select(attrs={"form": "provider-profile-form"}),
+    )
+
     class Meta:
         model = Provider
-        fields = ["city", "bio", "is_available", "specialties"]
+        fields = ["city", "state", "bio", "is_available", "specialties"]
         widgets = {
-            "city": forms.TextInput(attrs={"form": "provider-profile-form"}),
             "bio": forms.Textarea(
                 attrs={"form": "provider-profile-form", "class": "auto-grow"}
             ),

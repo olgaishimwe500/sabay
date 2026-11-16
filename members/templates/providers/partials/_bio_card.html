@@ -57,10 +57,11 @@
 			{% endfor %}
 		</div>
 		<div class="location">
-			<h3>State</h3>
-			<label>
-				<input type="text" value="Oregon" readonly>
-			</label>
+			<label for="{{ profile_form.state.id_for_label }}"><h3>State</h3></label>
+			{{ profile_form.state }}
+			{% for error in profile_form.state.errors %}
+			<p class="form-error" role="alert">{{ error }}</p>
+			{% endfor %}
 		</div>
 
 

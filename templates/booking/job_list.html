@@ -69,7 +69,7 @@
         </div>
         <div>
           <dt>Address</dt>
-          <dd>{% if job.status == "accepted" %}{{ job.address }}{% else %}Shared after confirmation{% endif %}</dd>
+	  <dd>{% if job.status == "accepted" %}{{ job.address }}, {{ job.city }}, {{job.state }} {{ job.zip_code }} {% else %} {{ job.city }}, {{ job.state }}{% endif %}</dd>
         </div>
       </dl>
 
