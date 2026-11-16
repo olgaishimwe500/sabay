@@ -7,7 +7,7 @@
 			{% if provider.profilePicture %}
 			<img src="{{ provider.profilePicture.url }}" alt="{{ provider.user.get_full_name }}'s profile picture">
 			{% else %}
-			<span class="profile-initials" aria-hidden="true">{{ provider.user.first_name|first|upper }}{{ provider.user.last_name|first|upper }}</span>
+			<span class="profile-initials" aria-hidden="true">{% if provider.user.first_name %}{{ provider.user.first_name|first|upper }}{{ provider.user.last_name|first|upper }}{% else %}{{ provider.user.username|first|upper }}{% endif %}</span>
 			{% endif %}
 		</div>
 		<div class="profile-card-info">
