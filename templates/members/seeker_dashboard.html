@@ -33,7 +33,7 @@
 								{% if req.provider.profilePicture %}
 									<img src="{{ req.provider.profilePicture.url }}" alt="provider profile picture">
 								{% else %}
-								<span class="profile-initials" aria-hidden="true">{% if provider.user.first_name %}{{ provider.user.first_name|first|upper }}{{ provider.user.last_name|first|upper }}{% else %}{{ provider.user.username|first|upper }}{% endif %}</span>
+								<span class="profile-initials" aria-hidden="true">{% if req.provider.user.first_name %}{{ req.provider.user.first_name|first|upper }}{{ req.provider.user.last_name|first|upper }}{% else %}{{ req.provider.user.username|first|upper }}{% endif %}</span>
 								{% endif %}
 							</div>
 							<div class="job-info">
@@ -66,7 +66,8 @@
 						</div>
 						<div class="options">
 							<span class="job-req-status declined">Open</span>
-							<a class="button" href="{% url 'booking:job_detail' job.pk %}">Details</a>
+
+							<a class="button" href="{% url 'booking:my_jobs' %}?job={{ job.pk }}#job-detail">Details</a>
 						</div>
 					</div>
 					{% endfor %}
@@ -90,7 +91,7 @@
 							</div>
 						</div>
 						<div class="options">
-							<a class="button" href="{% url 'booking:job_detail' job.pk %}">Details</a>
+							<a class="button" href="{% url 'booking:my_jobs' %}?job={{ job.pk }}#job-detail">Details</a>
 						</div>
 					</div>
 					{% empty %}
