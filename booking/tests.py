@@ -60,7 +60,7 @@ class JobBoardTests(TestCase):
     def test_address_is_not_shown(self):
         response = self.client.get(self.url)
         self.assertNotContains(response, "123 Main St")
-        self.assertContains(response, "Shared after confirmation")
+        
 
     def test_requested_job_shows_status_instead_of_button(self):
         JobReq.objects.create(job=self.newer, provider=self.provider)

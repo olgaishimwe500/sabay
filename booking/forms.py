@@ -26,7 +26,8 @@ class JobPostForm(forms.ModelForm):
         required=False,
         empty_label="Any provider",
         label="Request a specific provider (optional)",
-        )
+    )
+
     class Meta:
         model = JobPost
         fields = [
@@ -43,10 +44,10 @@ class JobPostForm(forms.ModelForm):
         labels = {
             "schedule_start": "start",
             "schedule_end": "end",
-            "city":"City",
-            "state":"State",
+            "city": "City",
+            "state": "State",
             "address": "Street Address",
-            "zip_code" : "Zip code",
+            "zip_code": "Zip code",
             "more info": "anything else we shoul know",
         }
         widgets = {

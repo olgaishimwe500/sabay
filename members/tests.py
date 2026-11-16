@@ -114,7 +114,8 @@ class JobResponseTest(TestCase):
         self.client.post(self.url, {"action": "decline"})
 
         self.job.refresh_from_db()
-        self.assertEqual(self.job.status, "declined")
+        self.assertEqual(self.job.status, "open")
+        self.assertIsNone(self.job.provider)
 
 
 class CompleteJobTest(TestCase):

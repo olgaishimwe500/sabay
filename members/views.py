@@ -167,6 +167,7 @@ def job_response(request, job_id):
     elif action == "decline":
         job.status = "open"
         job.provider = None
+        job.save()
     return redirect("dashboard")
 
 
