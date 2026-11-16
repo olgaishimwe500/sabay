@@ -34,13 +34,19 @@ class JobPostForm(forms.ModelForm):
             "description",
             "schedule_start",
             "schedule_end",
+            "city",
+            "state",
             "address",
+            "zip_code",
             "provider",
         ]
         labels = {
             "schedule_start": "start",
             "schedule_end": "end",
-            "address": "where does the task happen",
+            "city":"City",
+            "state":"State",
+            "address": "Street Address",
+            "zip_code" : "Zip code",
             "more info": "anything else we shoul know",
         }
         widgets = {
