@@ -370,6 +370,10 @@ input:checked + .slider:before {
 	margin-top: 1rem;
 	width:100%;
 }
+
+.small-profile-initials{
+	font-size: 25px;
+}
 /* Wide screens: one row per job, details left and actions right */
 @media (min-width: 951px){
 	.options{
