@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -141,6 +140,8 @@ LOGIN_URL = "members:login"
 REDIRECT_URL_LOGIN = "home"
 REDIRECT_URL_LOGOUT = "home"
 
-# Local media storage (maybe for prod we can use a cdn??)
-MEDIA_URL = "media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+# Development email configuration
+# Prints emails to the terminal instead of actually sending them.
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+DEFAULT_FROM_EMAIL = "noreply@sabay.local"

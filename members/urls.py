@@ -57,4 +57,10 @@ urlpatterns = [
         views.dismiss_request,
         name="dismiss_request",
     ),
+    path("signup/", views.signup, name="signup"),
+    path(
+        "signup/invite/<str:token>/",
+        views.invite_signup,
+        name="invite_signup",
+    ),
 ]

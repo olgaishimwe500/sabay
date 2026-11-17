@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("members", "0001_initial"),
+        ("members", "0004_employee_seeker"),
     ]
 
     operations = [

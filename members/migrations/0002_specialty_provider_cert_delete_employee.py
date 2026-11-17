@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
     dependencies = [
         ("booking", "0002_remove_jobpost_employee"),
-        ("members", "0001_initial"),
+        ("members", "0004_employee_seeker"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
