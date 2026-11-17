@@ -1,4 +1,6 @@
 from django import forms
+from django.utils import timezone
+
 from members.models import Provider
 
 from .models import JobPost
@@ -63,6 +65,15 @@ class JobPostForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["schedule_start"].input_formats = [DT_FORMAT]
         self.fields["schedule_end"].input_formats = [DT_FORMAT]
+        min_dt = timezone.localtime().strftime(DT_FORMAT)
+        self.fields["schedule_start"].widget.attrs["min"] = min_dt
+        self.fields["schedule_end"].widget.attrs["min"] = min_dt
+
+    def clean_schedule_start(self):
+        start = self.cleaned_data.get("schedule_start")
+        if start and start < timezone.now():
+            raise forms.ValidationError("The start time cannot be in the past")
+        return start
 
     def clean(self):
         cleaned = super().clean()
