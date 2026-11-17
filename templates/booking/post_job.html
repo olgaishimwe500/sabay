@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Post a job | Sabay {% endblock %}
+{% block title %}{% if job %}Edit job{% else %}Post a job{% endif %} | Sabay {% endblock %}
 {% block content %}
-    <h1>Post a job </h1>
+    <h1>{% if job %}Edit job{% else %}Post a job{% endif %}</h1>
     <form method="post">
         {% csrf_token %}
         {{ form.errors }}
         {{ form.as_p }}
-        <button type="submit">Post</button>
+        <button type="submit">{% if job %}Save changes{% else %}Post{% endif %}</button>
         <a href="{% url 'members:seeker_profile' %}">Cancel</a>
 
     </form>
