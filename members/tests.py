@@ -226,6 +226,36 @@ class JobRequestButtonTest(TestCase):
         self.assertEqual(list(response.context["upcoming_jobs"]), [self.job])
 
 
+class SeekerDashboardUpcomingTest(TestCase):
+    def setUp(self):
+        self.ana = User.objects.create_user(username="ana", password="password")
+        self.seeker = Seeker.objects.create(user=self.ana)
+        self.provider = Provider.objects.create(
+            user=User.objects.create_user(username="john", password="password")
+        )
+
+    def make_job(self, start):
+        return JobPost.objects.create(
+            seeker=self.seeker,
+            provider=self.provider,
+            status="accepted",
+            task_type="Cleaning",
+            address="123 Test St",
+            schedule_start=start,
+            schedule_end=start + timedelta(hours=2),
+        )
+
+    def test_past_accepted_job_not_in_upcoming(self):
+        now = timezone.now()
+        self.make_job(now - timedelta(days=1))
+        future = self.make_job(now + timedelta(days=1))
+
+        self.client.login(username="ana", password="password")
+        response = self.client.get(reverse("members:seeker_dashboard"))
+
+        self.assertEqual(list(response.context["upcoming_jobs"]), [future])
+
+
 class LoginViewTests(TestCase):
     def setUp(self):
         self.url = reverse("members:login")

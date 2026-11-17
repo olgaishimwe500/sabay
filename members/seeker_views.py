@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django.utils import timezone
 
 from booking.models import JobReq
 
@@ -54,7 +55,10 @@ def seeker_dashboard(request):
         .exclude(applications__status="pending")
         .order_by("schedule_start")
     )
-    upcoming_jobs = jobs.filter(status="accepted").order_by("schedule_start")[:3]
+    # Accepted jobs whose start time has passed are no longer upcoming
+    upcoming_jobs = jobs.filter(
+        status="accepted", schedule_start__gte=timezone.now()
+    ).order_by("schedule_start")[:3]
 
     context = {
         "seeker": seeker,
