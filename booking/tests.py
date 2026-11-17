@@ -10,6 +10,7 @@ from members.models import Provider, Seeker
 from .models import JobPost, JobReq
 
 User = get_user_model()
+DT_FORMAT = "%Y-%m-%dT%H:%M"
 
 
 class JobBoardTests(TestCase):
@@ -295,3 +296,103 @@ class SeekerEditCancelTests(TestCase):
         self.assertEqual(response.status_code, 404)
         job.refresh_from_db()
         self.assertEqual(job.status, "accepted")
+
+
+class ExpiredDeclinedCreateTests(TestCase):
+    def setUp(self):
+        self.seeker = Seeker.objects.create(
+            user=User.objects.create_user("sally", password="pw")
+        )
+        self.provider = Provider.objects.create(
+            user=User.objects.create_user("pat", password="pw")
+        )
+        self.other_provider = Provider.objects.create(
+            user=User.objects.create_user("quinn", password="pw")
+        )
+
+    def make_job(self, task_type="Errands", **kwargs):
+        start = kwargs.pop("start", timezone.now() + timedelta(days=2))
+        data = {
+            "seeker": self.seeker,
+            "task_type": task_type,
+            "description": "Details",
+            "address": "123 Main St",
+            "city": "Portland",
+            "state": "OR",
+            "zip_code": "97201",
+            "schedule_start": start,
+            "schedule_end": start + timedelta(hours=2),
+        }
+        data.update(kwargs)
+        return JobPost.objects.create(**data)
+
+    def form_data(self, start):
+        return {
+            "task_type": "Pet Care",
+            "description": "Walk my dog",
+            "schedule_start": start.strftime(DT_FORMAT),
+            "schedule_end": (start + timedelta(hours=2)).strftime(DT_FORMAT),
+            "city": "Portland",
+            "state": "OR",
+            "address": "123 Main St",
+            "zip_code": "97201",
+            "provider": "",
+        }
+
+    # create jobs must not allow a past date
+    def test_past_start_is_rejected(self):
+        self.client.force_login(self.seeker.user)
+        past = timezone.now() - timedelta(days=1)
+        response = self.client.post(reverse("booking:post_job"), self.form_data(past))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("schedule_start", response.context["form"].errors)
+        self.assertEqual(JobPost.objects.count(), 0)
+
+    def test_future_start_is_accepted(self):
+        # control: proves the form data is valid, so the test above fails for the right reason
+        self.client.force_login(self.seeker.user)
+        future = timezone.now() + timedelta(days=2)
+        response = self.client.post(reverse("booking:post_job"), self.form_data(future))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(JobPost.objects.count(), 1)
+
+    # expired jobs should not show up on dashboards
+    def test_expired_job_not_on_seeker_dashboard(self):
+        self.make_job(task_type="ZebraExpired", status="expired")
+        self.client.force_login(self.seeker.user)
+        response = self.client.get(reverse("members:seeker_dashboard"))
+        self.assertNotContains(response, "ZebraExpired")
+
+    def test_expired_job_not_on_provider_dashboard(self):
+        self.make_job(task_type="ZebraExpired", status="expired")
+        self.client.force_login(self.provider.user)
+        response = self.client.get(reverse("dashboard"))
+        self.assertNotContains(response, "ZebraExpired")
+
+    def test_expired_job_shows_expired_tag_on_my_jobs(self):
+        self.make_job(task_type="ZebraExpired", status="expired")
+        self.client.force_login(self.seeker.user)
+        response = self.client.get(reverse("booking:my_jobs"))
+        self.assertContains(response, "ZebraExpired")
+        self.assertContains(response, "Expired")
+
+    # declined jobs reopen and are available to other providers
+    def test_decline_reopens_job_and_clears_provider(self):
+        job = self.make_job(provider=self.provider)
+        self.client.force_login(self.provider.user)
+        self.client.post(
+            reverse("members:job_response", args=[job.pk]), {"action": "decline"}
+        )
+        job.refresh_from_db()
+        self.assertEqual(job.status, "open")
+        self.assertIsNone(job.provider)
+
+    def test_declined_job_visible_to_other_provider(self):
+        job = self.make_job(provider=self.provider)
+        self.client.force_login(self.provider.user)
+        self.client.post(
+            reverse("members:job_response", args=[job.pk]), {"action": "decline"}
+        )
+        self.client.force_login(self.other_provider.user)
+        response = self.client.get(reverse("booking:job_list"))
+        self.assertIn(job, response.context["jobs"])
