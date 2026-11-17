@@ -60,4 +60,14 @@ class Migration(migrations.Migration):
                 ),
             ],
         ),
+        migrations.CreateMode(
+            name='CaretakerInvite',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('email', models.EmailField(max_length=254)),
+                ('token', models.CharField(max_length=64, unique=True)),
+                ('used', models.BooleanField(default=False)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+            ],
+        ),
     ]

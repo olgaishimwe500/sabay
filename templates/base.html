@@ -1,12 +1,12 @@
 {% load static %}
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% block title %}Sabay{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/simple.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <link rel="stylesheet" href="{% static 'css/simple.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}" />
     <script src="{% static 'js/nav.js' %}" defer></script>
     {% block extra_head %}{% endblock %}
   </head>
@@ -36,18 +36,15 @@
    			 	</form>
 			    {% else %}
 			    	<li><a href="{% url 'members:login' %}">Login</a></li>
+				<li><a href="{% url 'members:signup' %}">Sign Up</a></li>
 			    {% endif %}
 		    </ul>
 	    </nav>
+    {% block header %}
+    <!-- <h1>{% block page_heading %}Sabay{% endblock %}</h1> -->
+    {% endblock %}
 
-
-      {% block header %}
-	 <!-- <h1>{% block page_heading %}Sabay{% endblock %}</h1> -->
-      {% endblock %}
-
-    <main>
-      {% block content %}{% endblock %}
-    </main>
+    <main>{% block content %}{% endblock %}</main>
 
     <footer class="width-issue">
       {% block footer %}<p>&copy; {% now "Y" %} Sabay</p>{% endblock %}
