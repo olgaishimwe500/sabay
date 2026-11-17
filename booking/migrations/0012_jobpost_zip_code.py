@@ -5,16 +5,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('booking', '0011_jobpost_city_jobpost_state'),
+        ("booking", "0011_jobpost_city_jobpost_state"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='jobpost',
-            name='zip_code',
-            field=models.CharField(default='', max_length=5, validators=[django.core.validators.RegexValidator(message='Enter a valid US ZIP code (e.g., 12345 or 12345-6789).', regex='^\\d{5}(?:-\\d{4})?$')]),
+            model_name="jobpost",
+            name="zip_code",
+            field=models.CharField(
+                default="",
+                max_length=5,
+                validators=[
+                    django.core.validators.RegexValidator(
+                        message="Enter a valid US ZIP code (e.g., 12345 or 12345-6789).",
+                        regex="^\\d{5}(?:-\\d{4})?$",
+                    )
+                ],
+            ),
             preserve_default=False,
         ),
     ]

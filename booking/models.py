@@ -1,9 +1,10 @@
+from django.core.validators import RegexValidator
 from django.db import models, transaction
 from django.utils import timezone
-from django.core.validators import RegexValidator
 
 from members.models import Provider, Seeker
 from members.states import STATES
+
 # Create your models here.
 ##model for job postings. different from location.seeker or location.employee'
 
@@ -22,8 +23,9 @@ class JobPostQuerySet(models.QuerySet):
 
 class JobPost(models.Model):
     zip_validator = RegexValidator(
-    regex=r'^\d{5}(?:-\d{4})?$',
-    message="Enter a valid US ZIP code (e.g., 12345 or 12345-6789).")
+        regex=r"^\d{5}(?:-\d{4})?$",
+        message="Enter a valid US ZIP code (e.g., 12345 or 12345-6789).",
+    )
 
     seeker = models.ForeignKey(
         Seeker, on_delete=models.CASCADE, related_name="job_posts"

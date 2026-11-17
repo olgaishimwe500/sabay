@@ -1,6 +1,7 @@
+from datetime import date
+
 from django import forms
 from django.core.validators import FileExtensionValidator
-from datetime import date
 
 from .cities import CITIES
 from .models import Provider, ProviderCert, Seeker
@@ -118,4 +119,3 @@ class ProviderCertForm(forms.ModelForm):
         ):
             raise forms.ValidationError("You have already added this certificate.")
         return cert
-
