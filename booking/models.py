@@ -58,11 +58,32 @@ class JobPost(models.Model):
         ],
         default="open",
     )
+    # Both sides must confirm before the job counts as completed
+    seeker_completed = models.BooleanField(default=False)
+    provider_completed = models.BooleanField(default=False)
     is_recurring = models.BooleanField(default=False)
     recurrence_rule = models.CharField(max_length=20, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     objects = JobPostQuerySet.as_manager()
+
+    def has_started(self, now=None):
+        return self.schedule_start <= (now or timezone.now())
+
+    def mark_complete(self, by):
+        """
+        Records that the seeker or provider ("seeker"/"provider") says the job
+        is done. The job only becomes completed once both have confirmed.
+        """
+        if by == "seeker":
+            self.seeker_completed = True
+        elif by == "provider":
+            self.provider_completed = True
+        else:
+            raise ValueError(f"Unknown party: {by!r}")
+        if self.seeker_completed and self.provider_completed:
+            self.status = "completed"
+        self.save(update_fields=["seeker_completed", "provider_completed", "status"])
 
 
 class JobReq(models.Model):

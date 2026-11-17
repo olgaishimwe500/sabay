@@ -108,12 +108,18 @@
           <span class="board-action-status">No longer taking requests</span>
         {% endif %}
         {% if job.status == "accepted" %}
-          <form method="post" action="{% url 'members:complete_job' job.pk %}"
-                onsubmit="return confirm('Mark this job as complete?');">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.path }}">
-            <button type="submit">Complete</button>
-          </form>
+          {% if job.provider_completed %}
+            <span class="board-action-status">Waiting on seeker</span>
+          {% elif job.schedule_start <= now %}
+            <form method="post" action="{% url 'members:complete_job' job.pk %}"
+                  onsubmit="return confirm('Mark this job as complete?');">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.path }}?job={{ job.pk }}#job-detail">
+              <button type="submit">Complete</button>
+            </form>
+          {% else %}
+            <span class="board-action-status">Unable to complete until start date</span>
+          {% endif %}
         {% endif %}
       </div>
     </section>

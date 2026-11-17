@@ -126,7 +126,8 @@ class CompleteJobTest(TestCase):
         self.ana = User.objects.create_user(username="ana", password="password")
         self.seeker = Seeker.objects.create(user=self.ana)
 
-        start = timezone.now() + timedelta(days=1)
+        # Job already started, so it can be marked complete
+        start = timezone.now() - timedelta(hours=1)
         self.job = JobPost.objects.create(
             seeker=self.seeker,
             provider=self.provider,
@@ -138,22 +139,47 @@ class CompleteJobTest(TestCase):
         )
         self.url = reverse("members:complete_job", args=[self.job.id])
 
-    def test_dashboard_shows_complete_button(self):
-        self.client.login(username="john", password="password")
-        response = self.client.get(reverse("dashboard"))
-
-        self.assertContains(response, self.url)
-
-    def test_complete_sets_status(self):
-        self.client.login(username="john", password="password")
+    def test_provider_alone_does_not_complete(self):
+        self.client.force_login(self.john)
         response = self.client.post(self.url)
 
         self.assertRedirects(response, reverse("dashboard"))
         self.job.refresh_from_db()
+        self.assertTrue(self.job.provider_completed)
+        self.assertEqual(self.job.status, "accepted")
+
+    def test_seeker_alone_does_not_complete(self):
+        self.client.force_login(self.ana)
+        self.client.post(self.url)
+
+        self.job.refresh_from_db()
+        self.assertTrue(self.job.seeker_completed)
+        self.assertEqual(self.job.status, "accepted")
+
+    def test_both_confirm_completes_job(self):
+        self.client.force_login(self.john)
+        self.client.post(self.url)
+        self.client.force_login(self.ana)
+        self.client.post(self.url)
+
+        self.job.refresh_from_db()
         self.assertEqual(self.job.status, "completed")
 
+    def test_cannot_complete_before_start(self):
+        self.job.schedule_start = timezone.now() + timedelta(days=1)
+        self.job.schedule_end = self.job.schedule_start + timedelta(hours=2)
+        self.job.save()
+        for user in (self.john, self.ana):
+            self.client.force_login(user)
+            response = self.client.post(self.url)
+            self.assertEqual(response.status_code, 404)
+
+        self.job.refresh_from_db()
+        self.assertFalse(self.job.provider_completed)
+        self.assertFalse(self.job.seeker_completed)
+
     def test_get_not_allowed(self):
-        self.client.login(username="john", password="password")
+        self.client.force_login(self.john)
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 405)
@@ -161,20 +187,36 @@ class CompleteJobTest(TestCase):
     def test_other_provider_cannot_complete(self):
         toby = User.objects.create_user(username="toby", password="password")
         Provider.objects.create(user=toby)
-        self.client.login(username="toby", password="password")
+        self.client.force_login(toby)
         response = self.client.post(self.url)
 
         self.assertEqual(response.status_code, 404)
         self.job.refresh_from_db()
-        self.assertEqual(self.job.status, "accepted")
+        self.assertFalse(self.job.provider_completed)
+
+    def test_other_seeker_cannot_complete(self):
+        bea = User.objects.create_user(username="bea", password="password")
+        Seeker.objects.create(user=bea)
+        self.client.force_login(bea)
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 404)
+        self.job.refresh_from_db()
+        self.assertFalse(self.job.seeker_completed)
 
     def test_open_job_cannot_be_completed(self):
         self.job.status = "open"
         self.job.save()
-        self.client.login(username="john", password="password")
+        self.client.force_login(self.john)
         response = self.client.post(self.url)
 
         self.assertEqual(response.status_code, 404)
+
+    def test_seeker_sees_complete_button_after_start(self):
+        self.client.force_login(self.ana)
+        response = self.client.get(reverse("booking:my_jobs"))
+
+        self.assertContains(response, self.url)
 
 
 class JobRequestButtonTest(TestCase):

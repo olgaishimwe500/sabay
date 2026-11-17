@@ -137,5 +137,6 @@ def my_jobs(request):
             "selected": current,
             "has_selection": selected is not None,
             "pending_requests": pending_requests,
+            "now": now,
         },
     )

@@ -59,6 +59,22 @@
           </div>
         {% endif %}
 
+        {% if selected.status == "accepted" %}
+          <div class="board-actions">
+            {% if selected.seeker_completed %}
+              <span class="board-action-status">You marked this complete &middot; waiting on provider</span>
+            {% elif selected.schedule_start <= now %}
+              <form method="post" action="{% url 'members:complete_job' selected.pk %}"
+                    onsubmit="return confirm('Mark this job as complete?');">
+                {% csrf_token %}
+                <button type="submit">Mark complete</button>
+              </form>
+            {% else %}
+              <span class="board-action-status">You can mark this complete once it starts</span>
+            {% endif %}
+          </div>
+        {% endif %}
+
         {% for req in pending_requests %}
           <div class="board-seeker">
             <span class="board-avatar">{{ req.provider.user.username|slice:":1"|upper }}</span>

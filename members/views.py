@@ -6,6 +6,7 @@ from django.db import transaction
 from django.db.models import OuterRef, Subquery
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
@@ -207,12 +208,26 @@ def cancel_job(request, job_id):
 @login_required
 @require_POST
 def complete_job(request, job_id):
+    """
+    Lets the seeker or the provider on an accepted job confirm it is done.
+    The job is only marked completed once both have confirmed, and neither
+    can confirm before the job's start time.
+    """
     provider = getattr(request.user, "provider_profile", None)
-    if provider is None:
-        return redirect("members:seeker_dashboard")
-    job = get_object_or_404(JobPost, pk=job_id, provider=provider, status="accepted")
-    job.status = "completed"
-    job.save(update_fields=["status"])
+    seeker = getattr(request.user, "seeker_profile", None)
+    jobs = JobPost.objects.filter(
+        pk=job_id, status="accepted", schedule_start__lte=timezone.now()
+    )
+    if provider is not None:
+        job = get_object_or_404(jobs, provider=provider)
+        job.mark_complete("provider")
+        default_redirect = reverse("dashboard")
+    elif seeker is not None:
+        job = get_object_or_404(jobs, seeker=seeker)
+        job.mark_complete("seeker")
+        default_redirect = f"{reverse('booking:my_jobs')}?job={job.pk}#job-detail"
+    else:
+        return redirect("dashboard")
     next_url = request.POST.get("next")
     if next_url and url_has_allowed_host_and_scheme(
         next_url,
@@ -220,7 +235,7 @@ def complete_job(request, job_id):
         require_https=request.is_secure(),
     ):
         return redirect(next_url)
-    return redirect("dashboard")
+    return redirect(default_redirect)
 
 
 """
